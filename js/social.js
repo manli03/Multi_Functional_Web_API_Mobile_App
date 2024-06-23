@@ -2,9 +2,21 @@ document.addEventListener('DOMContentLoaded', () => {
   const loading = document.getElementById('loading');
   const content = document.getElementById('content');
 
-  fetch(`https://www.reddit.com/r/malaysia/top/.json?limit=5`)
+  fetch(`https://www.reddit.com/r/malaysia/top/.json?limit=10`)
     .then(response => response.json())
     .then(data => {
+      // Log user interaction
+      logUserInteraction('Fetched social media data');
+
+      function logUserInteraction(action) {
+        const interactions = JSON.parse(localStorage.getItem('interactions')) || [];
+        interactions.push({
+          action: action,
+          timestamp: new Date().toISOString()
+        });
+        localStorage.setItem('interactions', JSON.stringify(interactions));
+      }
+      
       // Hide loading spinner and show content
       loading.style.display = 'none';
       content.style.display = 'flex';

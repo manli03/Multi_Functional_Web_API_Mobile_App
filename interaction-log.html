@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Interactions</title>
+  <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/min/moment.min.js"></script>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: Arial, sans-serif;
+    }
+    .container {
+      margin-top: 20px;
+    }
+    #interaction-log ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    #interaction-log li {
+      background-color: #ffffff;
+      margin: 5px 0;
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    }
+    .filter-input {
+      margin-bottom: 10px;
+    }
+    .sort-buttons {
+      margin-bottom: 10px;
+    }
+    .date {
+      color: #007bff;
+      font-weight: bold;
+    }
+    .time {
+      color: #28a745;
+      font-weight: bold;
+    }
+    .action {
+      display: block;
+      margin-top: 5px;
+      color: #000000; /* Default color for actions without specific color */
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="text-center">User Interactions Log</h1>
+    <div class="filter-input text-center">
+      <input type="text" id="filter" class="form-control" placeholder="Filter by action...">
+    </div>
+    <div class="sort-buttons text-center">
+      <button class="btn btn-primary" onclick="sortInteractions('asc')">Sort Ascending</button>
+      <button class="btn btn-secondary" onclick="sortInteractions('desc')">Sort Descending</button>
+    </div>
+    <div id="interaction-log"></div>
+  </div>
+
+  <script>
+    // Retrieve interactions from localStorage
+    const interactions = JSON.parse(localStorage.getItem('interactions')) || [];
+    const interactionLog = document.getElementById('interaction-log');
+    const filterInput = document.getElementById('filter');
+
+    // Define colors for different log types
+    const logColors = {
+      'Fetched news data': '#ff5733',       // Red
+      'Clicked Read more for article:': '#a133ff', // Purple
+      'Fetched weather data': '#3357ff',    // Blue
+      'Fetched social media data': '#ff33a1', // Pink
+    //   'Clicked Read more for weather:': '#33ff57', // Green
+    //   'Clicked Read more for social media:': '#33fff2', // Cyan
+    //   'User logged in': '#ffc300',          // Yellow
+    //   'User logged out': '#ff5733',         // Orange
+    //   'Profile updated': '#900C3F',         // Dark Red
+    //   'Settings changed': '#581845',        // Dark Purple
+    //   'Notification received': '#C70039',   // Magenta
+    };
+
+    // Function to get color for a log action
+    function getColorForLog(action) {
+      for (const logType in logColors) {
+        if (action.startsWith(logType)) {
+          return logColors[logType];
+        }
+      }
+      return '#000000'; // Default color if no match is found
+    }
+
+    // Function to format interactions for display
+    function formatInteractions(interactions) {
+      return interactions.map(i => {
+        const formattedDate = moment(i.timestamp).format('DD-MM-YYYY');
+        const formattedTime = moment(i.timestamp).format('hh:mm:ss A');
+        const logColor = getColorForLog(i.action);
+        return `
+          <div>
+            <span class="date">${formattedDate}</span> <span class="time">${formattedTime}</span>
+            <span class="action" style="color: ${logColor};">${i.action}</span>
+          </div>
+        `;
+      });
+    }
+
+    // Function to display interactions
+    function displayInteractions(interactions) {
+      const formattedInteractions = formatInteractions(interactions);
+      interactionLog.innerHTML = '<ul>' + formattedInteractions.map(i => `<li>${i}</li>`).join('') + '</ul>';
+    }
+
+    // Function to sort interactions
+    function sortInteractions(order) {
+      const sortedInteractions = interactions.sort((a, b) => {
+        return order === 'asc' ? new Date(a.timestamp) - new Date(b.timestamp) : new Date(b.timestamp) - new Date(a.timestamp);
+      });
+      displayInteractions(sortedInteractions);
+    }
+
+    // Filter interactions based on input
+    filterInput.addEventListener('input', function() {
+      const filterText = filterInput.value.toLowerCase();
+      const filteredInteractions = interactions.filter(i => i.action.toLowerCase().includes(filterText));
+      displayInteractions(filteredInteractions);
+    });
+
+    // Initial display of interactions
+    displayInteractions(interactions);
+  </script>
+</body>
+</html>

@@ -8,6 +8,19 @@ document.addEventListener('DOMContentLoaded', () => {
   fetch(`http://api.openweathermap.org/data/2.5/weather?q=Changlun&appid=${weatherApiKey}`)
     .then(response => response.json())
     .then(data => {
+      // Log user interaction
+      logUserInteraction('Fetched weather data');
+
+      function logUserInteraction(action) {
+        const interactions = JSON.parse(localStorage.getItem('interactions')) || [];
+        interactions.push({
+          action: action,
+          timestamp: new Date().toISOString()
+        });
+        localStorage.setItem('interactions', JSON.stringify(interactions));
+      }
+      
+
       // Hide loading spinner and show content
       loading.style.display = 'none';
       content.style.display = 'block';

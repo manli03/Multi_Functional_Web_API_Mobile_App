@@ -5,9 +5,21 @@ document.addEventListener('DOMContentLoaded', () => {
   const loading = document.getElementById('loading');
   const content = document.getElementById('content');
 
-  fetch(`https://newsapi.org/v2/everything?pageSize=100&domains=thestar.com.my&apiKey=${newsApiKey}`)
+  function logUserInteraction(action) {
+    const interactions = JSON.parse(localStorage.getItem('interactions')) || [];
+    interactions.push({
+      action: action,
+      timestamp: new Date().toISOString()
+    });
+    localStorage.setItem('interactions', JSON.stringify(interactions));
+  }
+
+  fetch(`https://newsapi.org/v2/everything?domains=thestar.com.my&apiKey=${newsApiKey}`)
     .then(response => response.json())
     .then(data => {
+      // Log user interaction
+      logUserInteraction('Fetched news data');
+
       // Hide loading spinner and show content
       loading.style.display = 'none';
       content.style.display = 'flex';
@@ -26,13 +38,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 <h5 class="card-title">${article.title}</h5>
                 <p class="card-text">${article.description ? article.description : 'No description available.'}</p>
                 <p class="card-text"><small class="text-muted">Published at: ${publishedAt}</small></p>
-                <a href="${url}" target="_blank" class="btn btn-primary">Read more</a>
+                <a href="${url}" target="_blank" class="btn btn-primary read-more-btn">Read more</a>
               </div>
             </div>
           </div>
         `;
       });
       content.innerHTML = newsHTML;
+
+      // Add click event listener to "Read more" buttons
+      document.querySelectorAll('.read-more-btn').forEach(button => {
+        button.addEventListener('click', (event) => {
+          logUserInteraction(`Clicked Read more for article: ${event.target.parentElement.querySelector('.card-title').textContent}`);
+        });
+      });
     })
     .catch(error => {
       console.error('Error fetching news data:', error);
