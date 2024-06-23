@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const loading = document.getElementById('loading');
   const content = document.getElementById('content');
 
-  fetch(`https://newsapi.org/v2/top-headlines?country=us&apiKey=${newsApiKey}`)
+  fetch(`https://newsapi.org/v2/everything?pageSize=100&domains=thestar.com.my&apiKey=${newsApiKey}`)
     .then(response => response.json())
     .then(data => {
       // Hide loading spinner and show content
@@ -13,17 +13,20 @@ document.addEventListener('DOMContentLoaded', () => {
       content.style.display = 'flex';
 
       let newsHTML = '';
-      data.articles.forEach(article => {
+      data.articles.forEach((article, index) => {
         const publishedAt = moment(article.publishedAt).format('MMMM Do YYYY, h:mm:ss a');
+        const imageUrl = article.urlToImage ? article.urlToImage : '';
+        const url = article.url;
+
         newsHTML += `
           <div class="col-md-6">
             <div class="card">
-              <img src="${article.urlToImage}" class="card-img-top" alt="News Image">
+              ${imageUrl ? `<img src="${imageUrl}" class="card-img-top" alt="News Image">` : '<div class="no-image"></div>'}
               <div class="card-body">
                 <h5 class="card-title">${article.title}</h5>
-                <p class="card-text">${article.description}</p>
+                <p class="card-text">${article.description ? article.description : 'No description available.'}</p>
                 <p class="card-text"><small class="text-muted">Published at: ${publishedAt}</small></p>
-                <a href="${article.url}" class="btn btn-primary" target="_blank">Read more</a>
+                <a href="${url}" target="_blank" class="btn btn-primary">Read more</a>
               </div>
             </div>
           </div>
@@ -36,4 +39,3 @@ document.addEventListener('DOMContentLoaded', () => {
       loading.innerHTML = '<p class="text-danger">Failed to load data. Please try again later.</p>';
     });
 });
-
