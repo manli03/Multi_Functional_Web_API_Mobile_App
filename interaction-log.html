@@ -60,32 +60,30 @@
   </div>
 
   <script>
-    // Retrieve interactions from localStorage
+    // Retrieve interactions and sort order from localStorage
     const interactions = JSON.parse(localStorage.getItem('interactions')) || [];
+    const savedSortOrder = localStorage.getItem('sortOrder') || 'asc';
     const interactionLog = document.getElementById('interaction-log');
     const filterInput = document.getElementById('filter');
 
     // Define colors for different log types
     const logColors = {
-      'Fetched news data': '#ff5733',       // Red
-      'Clicked Read more for article:': '#a133ff', // Purple
-      'Fetched weather data': '#3357ff',    // Blue
-      'Fetched social media data': '#ff33a1', // Pink
-    //   'Clicked Read more for weather:': '#33ff57', // Green
-    //   'Clicked Read more for social media:': '#33fff2', // Cyan
-    //   'User logged in': '#ffc300',          // Yellow
-    //   'User logged out': '#ff5733',         // Orange
-    //   'Profile updated': '#900C3F',         // Dark Red
-    //   'Settings changed': '#581845',        // Dark Purple
-    //   'Notification received': '#C70039',   // Magenta
+      'news': '#ff5733',       // Orange
+      'weather': '#3357ff',    // Blue
+      'social': '#ff33a1',     // Pink
+      'error': '#ff0000'       // Red for errors
     };
 
     // Function to get color for a log action
     function getColorForLog(action) {
-      for (const logType in logColors) {
-        if (action.startsWith(logType)) {
-          return logColors[logType];
-        }
+      if (action.includes('Error')) {
+        return logColors['error']; // Red for errors
+      } else if (action.toLowerCase().includes('news')) {
+        return logColors['news'];
+      } else if (action.toLowerCase().includes('weather')) {
+        return logColors['weather'];
+      } else if (action.toLowerCase().includes('social')) {
+        return logColors['social'];
       }
       return '#000000'; // Default color if no match is found
     }
@@ -113,8 +111,9 @@
 
     // Function to sort interactions
     function sortInteractions(order) {
+      localStorage.setItem('sortOrder', order); // Save sort order to localStorage
       const sortedInteractions = interactions.sort((a, b) => {
-        return order === 'asc' ? new Date(a.timestamp) - new Date(b.timestamp) : new Date(b.timestamp) - new Date(a.timestamp);
+        return order === 'asc' ? a.index - b.index : b.index - a.index;
       });
       displayInteractions(sortedInteractions);
     }
@@ -126,8 +125,8 @@
       displayInteractions(filteredInteractions);
     });
 
-    // Initial display of interactions
-    displayInteractions(interactions);
+    // Initial display of interactions with saved sort order
+    sortInteractions(savedSortOrder);
   </script>
 </body>
 </html>

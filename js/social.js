@@ -2,21 +2,32 @@ document.addEventListener('DOMContentLoaded', () => {
   const loading = document.getElementById('loading');
   const content = document.getElementById('content');
 
+  function logUserInteraction(action, error = null) {
+    const interactions = JSON.parse(localStorage.getItem('interactions')) || [];
+    const index = interactions.length; // Use the length of the array as the index
+    const interaction = {
+      index: index,
+      action: error ? `[SOCIAL] ${action}: ${error}` : `[SOCIAL] ${action}`,
+      timestamp: new Date().toISOString()
+    };
+    interactions.push(interaction);
+    localStorage.setItem('interactions', JSON.stringify(interactions));
+  }
+
+  logUserInteraction('Page loaded');
+
   fetch(`https://www.reddit.com/r/malaysia/top/.json?limit=10`)
-    .then(response => response.json())
+    .then(response => {
+      logUserInteraction('Fetching social media data from API');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
     .then(data => {
       // Log user interaction
-      logUserInteraction('Fetched social media data');
+      logUserInteraction('Fetched social media data from API');
 
-      function logUserInteraction(action) {
-        const interactions = JSON.parse(localStorage.getItem('interactions')) || [];
-        interactions.push({
-          action: action,
-          timestamp: new Date().toISOString()
-        });
-        localStorage.setItem('interactions', JSON.stringify(interactions));
-      }
-      
       // Hide loading spinner and show content
       loading.style.display = 'none';
       content.style.display = 'flex';
@@ -38,9 +49,13 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
       });
       content.innerHTML = socialHTML;
+      logUserInteraction('Displayed social media posts');
     })
     .catch(error => {
-      console.error('Error fetching social media data:', error);
-      loading.innerHTML = '<p class="text-danger">Failed to load data. Please try again later.</p>';
+      logUserInteraction('Error fetching social media data from API', error.message);
+      loading.style.display = 'none';
+      content.style.display = 'flex';
+      content.innerHTML = '<p class="text-danger">Failed to load data. Please try again later.</p>';
+      logUserInteraction('Displayed error message');
     });
 });

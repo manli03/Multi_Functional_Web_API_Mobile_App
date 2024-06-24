@@ -5,27 +5,38 @@ document.addEventListener('DOMContentLoaded', () => {
   const loading = document.getElementById('loading');
   const content = document.getElementById('content');
 
-  function logUserInteraction(action) {
+  function logUserInteraction(action, error = null) {
     const interactions = JSON.parse(localStorage.getItem('interactions')) || [];
-    interactions.push({
-      action: action,
+    const index = interactions.length; // Use the length of the array as the index
+    const interaction = {
+      index: index,
+      action: error ? `[NEWS] ${action}: ${error}` : `[NEWS] ${action}`,
       timestamp: new Date().toISOString()
-    });
+    };
+    interactions.push(interaction);
     localStorage.setItem('interactions', JSON.stringify(interactions));
   }
 
+  logUserInteraction('Page loaded');
+
   fetch(`https://newsapi.org/v2/everything?domains=thestar.com.my&apiKey=${newsApiKey}`)
-    .then(response => response.json())
+    .then(response => {
+      logUserInteraction('Fetching news data from API');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
     .then(data => {
       // Log user interaction
-      logUserInteraction('Fetched news data');
+      logUserInteraction('Fetched news data from API');
 
       // Hide loading spinner and show content
       loading.style.display = 'none';
       content.style.display = 'flex';
 
       let newsHTML = '';
-      data.articles.forEach((article, index) => {
+      data.articles.forEach((article) => {
         const publishedAt = moment(article.publishedAt).format('MMMM Do YYYY, h:mm:ss a');
         const imageUrl = article.urlToImage ? article.urlToImage : '';
         const url = article.url;
@@ -46,6 +57,8 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       content.innerHTML = newsHTML;
 
+      logUserInteraction('Displayed news articles');
+
       // Add click event listener to "Read more" buttons
       document.querySelectorAll('.read-more-btn').forEach(button => {
         button.addEventListener('click', (event) => {
@@ -54,7 +67,10 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     })
     .catch(error => {
-      console.error('Error fetching news data:', error);
-      loading.innerHTML = '<p class="text-danger">Failed to load data. Please try again later.</p>';
+      logUserInteraction('Error fetching news data from API', error.message);
+      loading.style.display = 'none';
+      content.style.display = 'flex';
+      content.innerHTML = '<p class="text-danger">Failed to load data. Please try again later.</p>';
+      logUserInteraction('Displayed error message');
     });
 });

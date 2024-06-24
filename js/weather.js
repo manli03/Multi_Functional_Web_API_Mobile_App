@@ -5,21 +5,31 @@ document.addEventListener('DOMContentLoaded', () => {
   const loading = document.getElementById('loading');
   const content = document.getElementById('content');
 
+  function logUserInteraction(action, error = null) {
+    const interactions = JSON.parse(localStorage.getItem('interactions')) || [];
+    const index = interactions.length; // Use the length of the array as the index
+    const interaction = {
+      index: index,
+      action: error ? `[WEATHER] ${action}: ${error}` : `[WEATHER] ${action}`,
+      timestamp: new Date().toISOString()
+    };
+    interactions.push(interaction);
+    localStorage.setItem('interactions', JSON.stringify(interactions));
+  }
+
+  logUserInteraction('Page loaded');
+
   fetch(`http://api.openweathermap.org/data/2.5/weather?q=Changlun&appid=${weatherApiKey}`)
-    .then(response => response.json())
+    .then(response => {
+      logUserInteraction('Fetching weather data from API');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
     .then(data => {
       // Log user interaction
-      logUserInteraction('Fetched weather data');
-
-      function logUserInteraction(action) {
-        const interactions = JSON.parse(localStorage.getItem('interactions')) || [];
-        interactions.push({
-          action: action,
-          timestamp: new Date().toISOString()
-        });
-        localStorage.setItem('interactions', JSON.stringify(interactions));
-      }
-      
+      logUserInteraction('Fetched weather data from API');
 
       // Hide loading spinner and show content
       loading.style.display = 'none';
@@ -50,6 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <canvas id="weatherChart" width="400" height="200"></canvas>
         </div>
       `;
+      logUserInteraction('Displayed weather data');
 
       // Create a chart for visualizing temperature and feels like temperature
       const ctx = document.getElementById('weatherChart').getContext('2d');
@@ -73,9 +84,13 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         }
       });
+      logUserInteraction('Created weather chart');
     })
     .catch(error => {
-      console.error('Error fetching weather data:', error);
-      loading.innerHTML = '<p class="text-danger">Failed to load data. Please try again later.</p>';
+      logUserInteraction('Error fetching data from weather API', error.message);
+      loading.style.display = 'none';
+      content.style.display = 'flex';
+      content.innerHTML = '<p class="text-danger">Failed to load data. Please try again later.</p>';
+      logUserInteraction('Displayed error message');
     });
 });
