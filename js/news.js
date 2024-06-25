@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   logUserInteraction('Page loaded');
 
-  fetch(`https://api.currentsapi.services/v1/search?country=my&domain=thestar.com.my&page_size=200&apiKey=${newsApiKey}`) // Update the URL to match the actual API URL
+  fetch(`https://api.currentsapi.services/v1/search?country=my&page_size=200&apiKey=${newsApiKey}`) // Update the URL to match the actual API URL
   .then(response => {
     logUserInteraction('Fetching news data from API');
     if (!response.ok) {
