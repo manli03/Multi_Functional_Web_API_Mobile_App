@@ -2,8 +2,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const loading = document.getElementById('loading');
   const content = document.getElementById('content');
 
-  const client_id = 'prOHeuyKyZfLk94Hhl43ow';
-  const client_secret = 'HiPgmZAvbwXEjq4XgTBk3_v9g9QdhA';
+  const client_id = 'NOQFjh3rCI4rKcxsB72cCg';
+  const client_secret = '7m45wUIPVtjUTjQxhOT8dKUHcSx40g';
   const auth = btoa(`${client_id}:${client_secret}`);
   
   function logUserInteraction(action, error = null) {
