@@ -25,5 +25,31 @@
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script>
+    // Unified logging function
+    function logInteraction(type, action, error = null) {
+      const interactions = JSON.parse(localStorage.getItem('interactions')) || [];
+      const index = interactions.length; // Use the length of the array as the index
+      const interaction = {
+        index: index,
+        action: error ? `[${type}] ${action}: ${error}` : `[${type}] ${action}`,
+        timestamp: new Date().toISOString()
+      };
+      interactions.push(interaction);
+      localStorage.setItem('interactions', JSON.stringify(interactions));
+    }
+
+    // Log page load
+    document.addEventListener('DOMContentLoaded', () => {
+      logInteraction('MAIN PAGE', 'Main menu page loaded');
+    });
+
+    // Log menu button clicks
+    document.querySelectorAll('.main-menu .btn').forEach(button => {
+      button.addEventListener('click', (event) => {
+        logInteraction('USER', `Clicked ${event.target.textContent} button`);
+      });
+    });
+  </script>
 </body>
 </html>

@@ -91,9 +91,59 @@ body {
 }
 
 .no-image::after {
-  content: "No Image Available";
+  content: "Failed to load Image";
   position: absolute;
   color: #555;
   font-size: 1.2rem;
   text-align: center;
+}
+
+/* Pagination Controls */
+#pagination-top, #pagination-bottom {
+  margin: 10px auto;
+  padding: 10px;
+  background-color: #e9ecef;
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+#pagination-top .btn-link, #pagination-bottom .btn-link {
+  margin: 5px;
+  color: #007bff;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+#pagination-top .btn-link:hover, #pagination-bottom .btn-link:hover {
+  text-decoration: underline;
+}
+
+#pagination-top .font-weight-bold, #pagination-bottom .font-weight-bold {
+  font-weight: bold;
+}
+
+/* Media Queries for Mobile */
+@media (max-width: 768px) {
+  #pagination-top, #pagination-bottom {
+    margin: 10px auto;
+    padding: 5px;
+    background-color: #e9ecef;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  #pagination-top .btn-link, #pagination-bottom .btn-link {
+    margin: 3px;
+    padding: 5px 7px;
+    font-size: 14px;
+  }
+}
+
+#search-section input, #search-section select, #search-section button {
+  max-width: 300px;
+  margin: 5px auto;
 }

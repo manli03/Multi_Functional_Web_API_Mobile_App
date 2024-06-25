@@ -14,14 +14,73 @@
       <h1>Top News</h1>
       <p>Stay updated with the latest news</p>
     </div>
+    <div id="search-section" class="text-center mb-3">
+      <input type="text" id="search-input" class="form-control" placeholder="Search news...">
+      <select id="category-select" class="form-control mt-2">
+        <option value="">Select Category</option>
+        <option value="regional">Regional</option>
+        <option value="technology">Technology</option>
+        <option value="lifestyle">Lifestyle</option>
+        <option value="business">Business</option>
+        <option value="general">General</option>
+        <option value="programming">Programming</option>
+        <option value="science">Science</option>
+        <option value="entertainment">Entertainment</option>
+        <option value="world">World</option>
+        <option value="sports">Sports</option>
+        <option value="finance">Finance</option>
+        <option value="academia">Academia</option>
+        <option value="politics">Politics</option>
+        <option value="health">Health</option>
+        <option value="opinion">Opinion</option>
+        <option value="food">Food</option>
+        <option value="game">Game</option>
+        <option value="fashion">Fashion</option>
+        <option value="academic">Academic</option>
+        <option value="crap">Crap</option>
+        <option value="travel">Travel</option>
+        <option value="culture">Culture</option>
+        <option value="economy">Economy</option>
+        <option value="environment">Environment</option>
+        <option value="art">Art</option>
+        <option value="music">Music</option>
+        <option value="notsure">Not Sure</option>
+        <option value="CS">CS</option>
+        <option value="education">Education</option>
+        <option value="redundant">Redundant</option>
+        <option value="television">Television</option>
+        <option value="commodity">Commodity</option>
+        <option value="movie">Movie</option>
+        <option value="entrepreneur">Entrepreneur</option>
+        <option value="review">Review</option>
+        <option value="auto">Auto</option>
+        <option value="energy">Energy</option>
+        <option value="celebrity">Celebrity</option>
+        <option value="medical">Medical</option>
+        <option value="gadgets">Gadgets</option>
+        <option value="design">Design</option>
+        <option value="EE">EE</option>
+        <option value="security">Security</option>
+        <option value="mobile">Mobile</option>
+        <option value="estate">Estate</option>
+        <option value="funny">Funny</option>
+      </select>
+      <select id="language-select" class="form-control mt-2">
+        <option value="en">English</option>
+        <option value="msa">Malay</option>
+      </select>
+      <button id="search-button" class="btn btn-primary mt-2">Search</button>
+    </div>
     <div id="loading" class="text-center">
       <div class="spinner-border" role="status">
         <span class="sr-only">Loading...</span>
       </div>
     </div>
+    <div id="pagination-top" class="text-center"></div>
     <div id="content" class="row" style="display:none;">
       <!-- News content will be loaded here -->
     </div>
+    <div id="pagination-bottom" class="text-center mt-3"></div>
     <div class="text-center mt-3">
       <a href="index.html" class="btn btn-secondary">Back to Main Menu</a><br><br>
     </div>

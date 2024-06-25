@@ -73,19 +73,22 @@
       'news': '#ff5733',       // Orange
       'weather': '#3357ff',    // Blue
       'social': '#ff33a1',     // Pink
-      'error': '#ff0000'       // Red for errors
+      'error': '#ff0000',      // Red for errors
+      'user' : '#A020F0'       // Purple
     };
 
     // Function to get color for a log action
     function getColorForLog(action) {
       if (action.includes('Error')) {
         return logColors['error']; // Red for errors
-      } else if (action.toLowerCase().includes('news')) {
+      } else if (action.includes('[NEWS]')) {
         return logColors['news'];
-      } else if (action.toLowerCase().includes('weather')) {
+      } else if (action.includes('[WEATHER]')) {
         return logColors['weather'];
-      } else if (action.toLowerCase().includes('social')) {
+      } else if (action.includes('[SOCIAL]')) {
         return logColors['social'];
+      } else if (action.includes('[USER]')) {
+        return logColors['user'];
       }
       return '#000000'; // Default color if no match is found
     }
@@ -129,6 +132,7 @@
 
     // Initial display of interactions with saved sort order
     sortInteractions(savedSortOrder);
+    // localStorage.clear();
   </script>
 </body>
 </html>

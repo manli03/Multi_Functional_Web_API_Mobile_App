@@ -4,93 +4,161 @@ const weatherApiKey = 'bd5e378503939ddaee76f12ad7a97608';
 document.addEventListener('DOMContentLoaded', () => {
   const loading = document.getElementById('loading');
   const content = document.getElementById('content');
+  const currentTimeDisplay = document.getElementById('current-time');
+  const notification = document.getElementById('notification');
+  const lastFetchTimeDisplay = document.getElementById('last-fetch-time');
+  const backToMenuButton = document.querySelector('.btn-secondary');
 
-  function logUserInteraction(action, error = null) {
+  function logInteraction(type, action, error = null) {
     const interactions = JSON.parse(localStorage.getItem('interactions')) || [];
-    const index = interactions.length; // Use the length of the array as the index
+    const index = interactions.length;
     const interaction = {
       index: index,
-      action: error ? `[WEATHER] ${action}: ${error}` : `[WEATHER] ${action}`,
+      action: error ? `[${type}] ${action}: ${error}` : `[${type}] ${action}`,
       timestamp: new Date().toISOString()
     };
     interactions.push(interaction);
     localStorage.setItem('interactions', JSON.stringify(interactions));
   }
 
-  logUserInteraction('Page loaded');
+  function updateCurrentTime() {
+    const now = moment().format('MMMM Do YYYY, h:mm:ss a');
+    currentTimeDisplay.textContent = `Current Date and Time: ${now}`;
+  }
 
-  fetch(`https://api.openweathermap.org/data/2.5/weather?q=Changlun&appid=${weatherApiKey}`)
-    .then(response => {
-      logUserInteraction('Fetching weather data from API');
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      return response.json();
-    })
-    .then(data => {
-      // Log user interaction
-      logUserInteraction('Fetched weather data from API');
+  function showNotification(message) {
+    notification.textContent = message;
+    setTimeout(() => {
+      notification.textContent = '';
+    }, 3000);
+  }
 
-      // Hide loading spinner and show content
-      loading.style.display = 'none';
-      content.style.display = 'block';
+  function updateLastFetchTime() {
+    const lastFetchTimestamp = localStorage.getItem('lastFetchTimestamp');
+    if (lastFetchTimestamp) {
+      const formattedTime = moment(lastFetchTimestamp).format('h:mm:ss a');
+      lastFetchTimeDisplay.textContent = `Last Fetch Time: ${formattedTime}`;
+    } else {
+      lastFetchTimeDisplay.textContent = 'No previous fetch recorded.';
+    }
+  }
 
-      // Extract and format the data
-      const temperature = (data.main.temp - 273.15).toFixed(2); // Convert from Kelvin to Celsius
-      const feelsLike = (data.main.feels_like - 273.15).toFixed(2); // Convert from Kelvin to Celsius
-      const weatherDescription = data.weather[0].description;
-      const humidity = data.main.humidity;
-      const windSpeed = data.wind.speed;
-      const visibility = data.visibility / 1000; // Convert from meters to kilometers
-      const sunrise = moment.unix(data.sys.sunrise).format('HH:mm:ss');
-      const sunset = moment.unix(data.sys.sunset).format('HH:mm:ss');
+  logInteraction('WEATHER', 'Page loaded');
+  updateCurrentTime();
+  setInterval(updateCurrentTime, 1000); // Update current time every second
 
-      // Display the data
-      content.innerHTML = `
-        <div class="weather-card">
-          <h2>Weather in ${data.name}</h2>
-          <p>Temperature: ${temperature} °C</p>
-          <p>Feels Like: ${feelsLike} °C</p>
-          <p>Condition: ${weatherDescription}</p>
-          <p>Humidity: ${humidity}%</p>
-          <p>Wind Speed: ${windSpeed} m/s</p>
-          <p>Visibility: ${visibility} km</p>
-          <p>Sunrise: ${sunrise}</p>
-          <p>Sunset: ${sunset}</p>
-          <canvas id="weatherChart" width="400" height="200"></canvas>
-        </div>
-      `;
-      logUserInteraction('Displayed weather data');
+  function fetchWeatherData(latitude, longitude) {
+    const url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${weatherApiKey}`;
 
-      // Create a chart for visualizing temperature and feels like temperature
-      const ctx = document.getElementById('weatherChart').getContext('2d');
-      new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: ['Temperature', 'Feels Like'],
-          datasets: [{
-            label: 'Temperature (°C)',
-            data: [temperature, feelsLike],
-            backgroundColor: ['rgba(75, 192, 192, 0.2)', 'rgba(153, 102, 255, 0.2)'],
-            borderColor: ['rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)'],
-            borderWidth: 1
-          }]
-        },
-        options: {
-          scales: {
-            y: {
-              beginAtZero: true
+    fetch(url)
+      .then(response => {
+        logInteraction('WEATHER', 'Fetching weather data from API');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        logInteraction('WEATHER', 'Fetched weather data from API');
+
+        loading.style.display = 'none';
+        content.style.display = 'block';
+
+        const temperature = (data.main.temp - 273.15).toFixed(2); // Convert from Kelvin to Celsius
+        const feelsLike = (data.main.feels_like - 273.15).toFixed(2); // Convert from Kelvin to Celsius
+        const weatherDescription = data.weather[0].description;
+        const humidity = data.main.humidity;
+        const windSpeed = data.wind.speed;
+        const visibility = data.visibility / 1000; // Convert from meters to kilometers
+        const sunrise = moment.unix(data.sys.sunrise).format('h:mm:ss a');
+        const sunset = moment.unix(data.sys.sunset).format('h:mm:ss a');
+
+        content.innerHTML = `
+          <div class="weather-card">
+            <h2>Weather in ${data.name}</h2>
+            <p>Temperature: ${temperature} °C</p>
+            <p>Feels Like: ${feelsLike} °C</p>
+            <p>Condition: ${weatherDescription}</p>
+            <p>Humidity: ${humidity}%</p>
+            <p>Wind Speed: ${windSpeed} m/s</p>
+            <p>Visibility: ${visibility} km</p>
+            <p>Sunrise: ${sunrise}</p>
+            <p>Sunset: ${sunset}</p>
+            <canvas id="weatherChart" width="400" height="200"></canvas>
+          </div>
+        `;
+
+        logInteraction('WEATHER', 'Displayed weather data');
+
+        const ctx = document.getElementById('weatherChart').getContext('2d');
+        new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: ['Temperature', 'Feels Like'],
+            datasets: [{
+              label: 'Temperature (°C)',
+              data: [temperature, feelsLike],
+              backgroundColor: ['rgba(75, 192, 192, 0.2)', 'rgba(153, 102, 255, 0.2)'],
+              borderColor: ['rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)'],
+              borderWidth: 1
+            }]
+          },
+          options: {
+            scales: {
+              y: {
+                beginAtZero: true
+              }
             }
           }
-        }
+        });
+
+        const now = new Date().toISOString();
+        localStorage.setItem('lastFetchTimestamp', now);
+
+        logInteraction('WEATHER', 'Created weather chart');
+        showNotification('Weather data updated');
+        updateLastFetchTime();
+      })
+      .catch(error => {
+        logInteraction('WEATHER', 'Error fetching data from weather API', error.message);
+        loading.style.display = 'none';
+        content.style.display = 'flex';
+        content.innerHTML = '<p class="text-danger">Failed to load data. Please try again later.</p>';
       });
-      logUserInteraction('Created weather chart');
-    })
-    .catch(error => {
-      logUserInteraction('Error fetching data from weather API', error.message);
+  }
+
+  function getUserLocation() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(position => {
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
+        logInteraction('WEATHER', `Fetched user location: Latitude ${latitude}, Longitude ${longitude}`);
+        fetchWeatherData(latitude, longitude);
+      }, error => {
+        logInteraction('WEATHER', 'Error fetching user location', error.message);
+        loading.style.display = 'none';
+        content.style.display = 'flex';
+        content.innerHTML = '<p class="text-danger">Failed to get your location. Please enable location services and try again.</p>';
+      });
+    } else {
+      logInteraction('WEATHER', 'Geolocation is not supported by this browser');
       loading.style.display = 'none';
       content.style.display = 'flex';
-      content.innerHTML = '<p class="text-danger">Failed to load data. Please try again later.</p>';
-      logUserInteraction('Displayed error message');
-    });
+      content.innerHTML = '<p class="text-danger">Geolocation is not supported by this browser.</p>';
+    }
+  }
+
+  // Log back to menu button click
+  backToMenuButton.addEventListener('click', () => {
+    logInteraction('USER', 'Clicked Back to Main Menu button');
+  });
+
+  updateLastFetchTime();
+  getUserLocation();
+
+  // Reload the page every minute
+  setInterval(() => {
+    logInteraction('WEATHER', 'Displayed error message for geolocation support');
+    location.reload();
+  }, 60000); // 60000 ms = 1 minute
 });
