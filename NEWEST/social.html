@@ -3,31 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="referrer" content="origin-when-cross-origin"> <!-- Added referrer policy -->
-  <title>Weather</title>
+  <title>Social Media</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
   <link rel="stylesheet" href="css/styles.css">
   <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/min/moment.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <div class="container">
     <div class="jumbotron text-center">
-      <h1>Weather Information</h1>
-      <p>Get the latest weather updates</p>
+      <h1>Top Reddit Posts in Malaysia</h1>
+      <p>Explore trending topics and discussions</p>
     </div>
     <div id="loading" class="text-center">
       <div class="spinner-border" role="status">
         <span class="sr-only">Loading...</span>
       </div>
     </div>
-    <div id="content" class="text-center" style="display:none;">
-      <!-- Weather content will be loaded here -->
+    <div id="content" class="row" style="display:none;">
+      <!-- Social media content will be loaded here -->
     </div>
     <div class="text-center mt-3">
       <a href="index.html" class="btn btn-secondary">Back to Main Menu</a><br><br>
     </div>
   </div>
-  <script src="js/weather.js"></script>
+  <script src="js/social.js"></script>
 </body>
 </html>

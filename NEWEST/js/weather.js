@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   logUserInteraction('Page loaded');
 
-  fetch(`https://api.openweathermap.org/data/2.5/weather?q=Changlun&appid=${weatherApiKey}`)
+  fetch(`http://api.openweathermap.org/data/2.5/weather?q=Changlun&appid=${weatherApiKey}`)
     .then(response => {
       logUserInteraction('Fetching weather data from API');
       if (!response.ok) {

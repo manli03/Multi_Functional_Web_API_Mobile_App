@@ -93,8 +93,8 @@
     // Function to format interactions for display
     function formatInteractions(interactions) {
       return interactions.map(i => {
-        const formattedDate = moment(i.timestamp).format('D-M-YYYY');
-        const formattedTime = moment(i.timestamp).format('h:mm:ss A');
+        const formattedDate = moment(i.timestamp).format('DD-MM-YYYY');
+        const formattedTime = moment(i.timestamp).format('hh:mm:ss A');
         const logColor = getColorForLog(i.action);
         return `
           <div>
