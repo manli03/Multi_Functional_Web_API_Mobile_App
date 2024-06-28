@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const searchInput = document.getElementById('search-input');
   const categorySelect = document.getElementById('category-select');
   const languageSelect = document.getElementById('language-select');
-  const backToMenuButton = document.querySelector('.btn-secondary');
+  const backToHomeButton = document.querySelector('.btn-secondary');
 
   // Unified logging function
   function logInteraction(type, action, error = null) {
@@ -163,8 +163,8 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // Log back to menu button click
-  backToMenuButton.addEventListener('click', () => {
-    logInteraction('USER', 'Clicked Back to Main Menu button');
+  backToHomeButton.addEventListener('click', () => {
+    logInteraction('USER', 'Clicked Back to Home Page button');
   });
 
   // Initial fetch

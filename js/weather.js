@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const currentTimeDisplay = document.getElementById('current-time');
   const notification = document.getElementById('notification');
   const lastFetchTimeDisplay = document.getElementById('last-fetch-time');
-  const backToMenuButton = document.querySelector('.btn-secondary');
+  const backToHomeButton = document.querySelector('.btn-secondary');
 
   function logInteraction(type, action, error = null) {
     const interactions = JSON.parse(localStorage.getItem('interactions')) || [];
@@ -47,6 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
   updateCurrentTime();
   setInterval(updateCurrentTime, 1000); // Update current time every second
 
+  // Function to fetch weather data
   function fetchWeatherData(latitude, longitude) {
     const url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${weatherApiKey}`;
 
@@ -61,6 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
       .then(data => {
         logInteraction('WEATHER', 'Fetched weather data from API');
 
+        // Hide loading and show content
         loading.style.display = 'none';
         content.style.display = 'block';
 
@@ -127,48 +129,51 @@ document.addEventListener('DOMContentLoaded', () => {
       });
   }
 
+  // Function to get user location
   function getUserLocation() {
+    // Set a timeout for the geolocation request
+    const locationTimeout = setTimeout(() => {
+      handleGeolocationError({ message: 'Location request timed out' });
+    }, 10000); // 10 seconds timeout
+
+    // Check for geolocation permission
     if (navigator.permissions) {
       navigator.permissions.query({ name: 'geolocation' }).then(function (result) {
-        if (result.state === 'granted') {
+        if (result.state === 'granted' || result.state === 'prompt') {
           navigator.geolocation.getCurrentPosition(position => {
+            clearTimeout(locationTimeout);
             const latitude = position.coords.latitude;
             const longitude = position.coords.longitude;
             logInteraction('WEATHER', `Fetched user location: Latitude ${latitude}, Longitude ${longitude}`);
             fetchWeatherData(latitude, longitude);
           }, error => {
-            handleGeolocationError(error);
-          });
-        } else if (result.state === 'prompt') {
-          navigator.geolocation.getCurrentPosition(position => {
-            const latitude = position.coords.latitude;
-            const longitude = position.coords.longitude;
-            logInteraction('WEATHER', `Fetched user location: Latitude ${latitude}, Longitude ${longitude}`);
-            fetchWeatherData(latitude, longitude);
-          }, error => {
+            clearTimeout(locationTimeout);
             handleGeolocationError(error);
           });
         } else if (result.state === 'denied') {
+          clearTimeout(locationTimeout);
           handleGeolocationError({ message: 'Location permission denied' });
         }
       });
     } else if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(position => {
+        clearTimeout(locationTimeout);
         const latitude = position.coords.latitude;
         const longitude = position.coords.longitude;
         logInteraction('WEATHER', `Fetched user location: Latitude ${latitude}, Longitude ${longitude}`);
         fetchWeatherData(latitude, longitude);
       }, error => {
+        clearTimeout(locationTimeout);
         handleGeolocationError(error);
       });
     } else {
+      clearTimeout(locationTimeout);
       logInteraction('WEATHER', 'Geolocation is not supported by this device');
-      loading.style.display = 'none';
-      content.style.display = 'block';  // Ensuring content is displayed as a block
-      content.innerHTML = '<p class="text-danger">Geolocation is not supported by this device.</p>';
+      handleGeolocationError({ message: 'Geolocation is not supported by this device' });
     }
   }
 
+  // Function to handle geolocation errors
   function handleGeolocationError(error) {
     logInteraction('WEATHER', 'Error fetching user location', error.message);
     loading.style.display = 'none';
@@ -177,8 +182,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Log back to menu button click
-  backToMenuButton.addEventListener('click', () => {
-    logInteraction('USER', 'Clicked Back to Main Menu button');
+  backToHomeButton.addEventListener('click', () => {
+    logInteraction('USER', 'Clicked Back to Home Page button');
   });
 
   updateLastFetchTime();

@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const searchInput = document.getElementById('search-input');
   const paginationTop = document.getElementById('pagination-top');
   const paginationBottom = document.getElementById('pagination-bottom');
-  const backToMenuButton = document.querySelector('.btn-secondary');
+  const backToHomeButton = document.querySelector('.btn-secondary');
   const pageSize = 20;
   let currentPage = 1;
   let postsData = [];
@@ -146,8 +146,8 @@ document.addEventListener('DOMContentLoaded', () => {
     displayPage(currentPage);
   };
 
-  backToMenuButton.addEventListener('click', () => {
-    logInteraction('USER', 'Clicked Back to Main Menu button');
+  backToHomeButton.addEventListener('click', () => {
+    logInteraction('USER', 'Clicked Back to Home Page button');
   });
 
   fetchPosts();
