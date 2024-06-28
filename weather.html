@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="referrer" content="origin-when-cross-origin"> <!-- Added referrer policy -->
+  <meta name="referrer" content="origin-when-cross-origin">
   <title>Weather</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
   <link rel="stylesheet" href="css/styles.css">
   <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/min/moment.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -15,6 +16,15 @@
     <div class="jumbotron text-center">
       <h1>Weather Information</h1>
       <p>Get the latest weather updates</p>
+      <div class="input-group mb-3">
+        <input type="text" id="cityInput" class="form-control" placeholder="Enter city name" aria-label="City name">
+        <div class="input-group-append">
+          <button id="getCurrentLocationBtn" class="btn btn-outline-secondary" type="button">
+            <i class="fas fa-map-marker-alt"></i>
+          </button>
+        </div>
+      </div>
+      <button id="getWeatherBtn" class="btn btn-primary">Get Weather</button>
     </div>
     <div id="loading" class="text-center">
       <div class="spinner-border" role="status">
@@ -24,10 +34,18 @@
     <div id="content" class="text-center" style="display:none;">
       <!-- Weather content will be loaded here -->
     </div>
+    <div id="forecast" class="text-center" style="display:none;">
+      <!-- Forecast content will be loaded here -->
+    </div>
+    <div id="daily-forecast" class="text-center" style="display:none;">
+      <!-- Daily forecast content will be loaded here -->
+    </div>
+    <div id="hourly-forecast" class="text-center" style="display:none;">
+      <!-- Hourly forecast content will be loaded here -->
+    </div>
     <div class="text-center mt-3">
       <a href="index.html" class="btn btn-secondary">Back to Home Page</a><br><br>
     </div>
-    <div id="current-time" class="text-center"></div>
     <div id="notification" class="text-center text-info"></div>
     <div id="last-fetch-time" class="text-center text-muted"></div>
   </div><br>
