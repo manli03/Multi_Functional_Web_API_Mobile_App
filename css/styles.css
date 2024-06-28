@@ -170,9 +170,11 @@ body {
   min-width: 120px;
 }
 
-.forecast-card.today-forecast {
-  background-color: #ffe342; /* Highlight today's forecast */
+.forecast-card.selected {
+  border: 2px solid #007bff;
+  background-color: #dfefff;
 }
+
 
 .forecast-card h5 {
   font-size: 1rem;

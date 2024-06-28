@@ -142,7 +142,8 @@ document.addEventListener('DOMContentLoaded', () => {
   function displayWeatherData(data) {
     hideLoading();
     content.style.display = 'block';
-
+  
+    const todayDate = moment().format('MMMM Do, YYYY');
     const temperature = (data.main.temp - 273.15).toFixed(2);
     const feelsLike = (data.main.feels_like - 273.15).toFixed(2);
     const weatherDescription = data.weather[0].description;
@@ -152,10 +153,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const sunrise = moment.unix(data.sys.sunrise).format('h:mm:ss a');
     const sunset = moment.unix(data.sys.sunset).format('h:mm:ss a');
     const icon = data.weather[0].icon;
-
+  
     content.innerHTML = `
       <div class="weather-card animated fadeIn">
         <h2>Weather in ${data.name}</h2>
+        <p><strong>${todayDate}</strong></p>
         <img src="http://openweathermap.org/img/wn/${icon}@2x.png" alt="Weather icon" class="weather-icon">
         <p><i class="fas fa-thermometer-half"></i> Temperature: ${temperature} °C</p>
         <p><i class="fas fa-thermometer"></i> Feels Like: ${feelsLike} °C</p>
@@ -168,7 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <canvas id="weatherChart" width="400" height="200"></canvas>
       </div>
     `;
-
+  
     const ctx = document.getElementById('weatherChart').getContext('2d');
     new Chart(ctx, {
       type: 'bar',
@@ -190,13 +192,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
     });
-
+  
     const now = new Date().toISOString();
     localStorage.setItem('lastFetchTimestamp', now);
     logInteraction('WEATHER', 'Created weather chart');
     showNotification('Weather data updated');
     updateLastFetchTime();
-  }
+  }  
 
   // Fetches and displays the 7-day weather forecast.
   function fetchWeatherForecast(latitude, longitude) {
@@ -248,9 +250,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const start = dayIndex * 24;
     const end = start + 24;
     const hourlyData = window.hourlyDataFull.slice(start, end);
-
+  
+    // Remove the 'selected' class from all forecast cards
+    document.querySelectorAll('.forecast-card').forEach(card => {
+      card.classList.remove('selected');
+    });
+  
+    // Add the 'selected' class to the clicked card
+    document.querySelectorAll('.forecast-card')[dayIndex].classList.add('selected');
+  
     let hourlyHTML = '<h3>Hourly Forecast</h3><div class="hourly-forecast">';
-
+  
     if (hourlyData.length === 0) {
       hourlyHTML += '<p class="no-data">No data available for this day.</p>';
     } else {
@@ -258,7 +268,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const hourTime = moment.unix(hour.dt).format('HH:mm');
         const hourTemp = (hour.temp - 273.15).toFixed(2);
         const hourIcon = hour.weather[0].icon;
-
+  
         hourlyHTML += `
           <div class="hourly-card">
             <h6>${hourTime}</h6>
@@ -268,11 +278,11 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
       });
     }
-
+  
     hourlyHTML += '</div>';
     hourlyForecast.innerHTML = hourlyHTML;
     hourlyForecast.style.display = 'block';
-  };
+  };  
 
   // Fetches the user's current location.
   function getUserLocation() {
