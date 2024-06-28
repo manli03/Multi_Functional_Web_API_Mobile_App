@@ -122,30 +122,58 @@ document.addEventListener('DOMContentLoaded', () => {
       .catch(error => {
         logInteraction('WEATHER', 'Error fetching data from weather API', error.message);
         loading.style.display = 'none';
-        content.style.display = 'flex';
+        content.style.display = 'block';  // Ensuring content is displayed as a block
         content.innerHTML = '<p class="text-danger">Failed to load data. Please try again later.</p>';
       });
   }
 
   function getUserLocation() {
-    if (navigator.geolocation) {
+    if (navigator.permissions) {
+      navigator.permissions.query({ name: 'geolocation' }).then(function (result) {
+        if (result.state === 'granted') {
+          navigator.geolocation.getCurrentPosition(position => {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+            logInteraction('WEATHER', `Fetched user location: Latitude ${latitude}, Longitude ${longitude}`);
+            fetchWeatherData(latitude, longitude);
+          }, error => {
+            handleGeolocationError(error);
+          });
+        } else if (result.state === 'prompt') {
+          navigator.geolocation.getCurrentPosition(position => {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+            logInteraction('WEATHER', `Fetched user location: Latitude ${latitude}, Longitude ${longitude}`);
+            fetchWeatherData(latitude, longitude);
+          }, error => {
+            handleGeolocationError(error);
+          });
+        } else if (result.state === 'denied') {
+          handleGeolocationError({ message: 'Location permission denied' });
+        }
+      });
+    } else if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(position => {
         const latitude = position.coords.latitude;
         const longitude = position.coords.longitude;
         logInteraction('WEATHER', `Fetched user location: Latitude ${latitude}, Longitude ${longitude}`);
         fetchWeatherData(latitude, longitude);
       }, error => {
-        logInteraction('WEATHER', 'Error fetching user location', error.message);
-        loading.style.display = 'none';
-        content.style.display = 'block';
-        content.innerHTML = '<p class="text-danger">Failed to get your location. Please enable location services and try again.</p>';
+        handleGeolocationError(error);
       });
     } else {
       logInteraction('WEATHER', 'Geolocation is not supported by this device');
       loading.style.display = 'none';
-      content.style.display = 'block';
+      content.style.display = 'block';  // Ensuring content is displayed as a block
       content.innerHTML = '<p class="text-danger">Geolocation is not supported by this device.</p>';
     }
+  }
+
+  function handleGeolocationError(error) {
+    logInteraction('WEATHER', 'Error fetching user location', error.message);
+    loading.style.display = 'none';
+    content.style.display = 'block';  // Ensuring content is displayed as a block
+    content.innerHTML = '<p class="text-danger">Failed to get your location. Please enable location services and try again.</p>';
   }
 
   // Log back to menu button click
@@ -158,7 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Reload the page every minute
   setInterval(() => {
-    logInteraction('WEATHER', 'Displayed error message for geolocation support');
+    logInteraction('WEATHER', 'Reloading page');
     location.reload();
   }, 60000); // 60000 ms = 1 minute
 });
