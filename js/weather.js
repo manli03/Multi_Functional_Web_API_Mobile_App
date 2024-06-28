@@ -137,14 +137,14 @@ document.addEventListener('DOMContentLoaded', () => {
       }, error => {
         logInteraction('WEATHER', 'Error fetching user location', error.message);
         loading.style.display = 'none';
-        content.style.display = 'flex';
+        content.style.display = 'block';
         content.innerHTML = '<p class="text-danger">Failed to get your location. Please enable location services and try again.</p>';
       });
     } else {
-      logInteraction('WEATHER', 'Geolocation is not supported by this browser');
+      logInteraction('WEATHER', 'Geolocation is not supported by this device');
       loading.style.display = 'none';
-      content.style.display = 'flex';
-      content.innerHTML = '<p class="text-danger">Geolocation is not supported by this browser.</p>';
+      content.style.display = 'block';
+      content.innerHTML = '<p class="text-danger">Geolocation is not supported by this device.</p>';
     }
   }
 

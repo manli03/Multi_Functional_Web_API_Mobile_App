@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let newsHTML = '';
     for (const newsItem of pageNews) {
-      const publishedAt = moment(newsItem.published).format('MMMM Do YYYY, h:mm:ss a');
+      const publishedAt = moment(newsItem.published).format('MMMM Do YYYY, h:mm a');
       const imageUrl = newsItem.image ? newsItem.image : '';
       const url = newsItem.url;
 

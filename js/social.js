@@ -88,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let postsHTML = '';
     for (const post of pagePosts) {
-      const createdAt = moment.unix(post.data.created_utc).format('MMMM Do YYYY, h:mm:ss a');
+      const createdAt = moment.unix(post.data.created_utc).format('MMMM Do YYYY, h:mm a');
       const imageUrl = post.data.thumbnail && post.data.thumbnail.startsWith('http') ? post.data.thumbnail : null;
       const url = post.data.url;
 
