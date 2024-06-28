@@ -31,11 +31,6 @@ body {
   margin: 20px 0;
 }
 
-.card img {
-  max-height: 150px;
-  object-fit: cover;
-}
-
 #content {
   display: flex;
   flex-wrap: wrap;

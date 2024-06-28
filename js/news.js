@@ -105,7 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const imageUrl = newsItem.image ? newsItem.image : '';
       const url = newsItem.url;
 
-      const imageHTML = imageUrl ? `<img src="${imageUrl}" class="card-img-top" alt="News Image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` : '<div class="no-image"></div>';
+      const imageHTML = imageUrl ? `<img src="${imageUrl}" alt="News Image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` : '<div class="no-image"></div>';
 
       newsHTML += `
         <div class="col-md-6">

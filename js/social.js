@@ -92,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const imageUrl = post.data.thumbnail && post.data.thumbnail.startsWith('http') ? post.data.thumbnail : null;
       const url = post.data.url;
 
-      const imageHTML = imageUrl ? `<img src="${imageUrl}" class="card-img-top" alt="Post Image" onerror="this.style.display='none';">` : '';
+      const imageHTML = imageUrl ? `<img src="${imageUrl}" alt="Post Image" onerror="this.style.display='none';">` : '';
 
       postsHTML += `
         <div class="col-md-6">
