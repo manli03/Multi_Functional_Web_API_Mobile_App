@@ -257,7 +257,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   
     // Add the 'selected' class to the clicked card
-    document.querySelectorAll('.forecast-card')[dayIndex].classList.add('selected');
+    const selectedCard = document.querySelectorAll('.forecast-card')[dayIndex];
+    selectedCard.classList.add('selected');
+  
+    // Auto scroll to center the selected card
+    selectedCard.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
   
     let hourlyHTML = '<h3>Hourly Forecast</h3><div class="hourly-forecast">';
   
@@ -282,7 +286,8 @@ document.addEventListener('DOMContentLoaded', () => {
     hourlyHTML += '</div>';
     hourlyForecast.innerHTML = hourlyHTML;
     hourlyForecast.style.display = 'block';
-  };  
+  };
+  
 
   // Fetches the user's current location.
   function getUserLocation() {
