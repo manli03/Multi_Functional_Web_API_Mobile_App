@@ -1,55 +1,126 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Multi-Functional App</title>
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-  <link rel="stylesheet" href="css/styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Multi-Functional App</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            overflow: hidden; /* Prevent scrolling */
+        }
+        .bg {
+            background-image: url('resource/bg.jpg'); /* Random background image */
+            height: 100%;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            position: relative;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+        .welcome-text {
+            margin-top: 20px;
+        }
+        .welcome-text h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        .welcome-text p {
+            font-size: 1.2em;
+        }
+        .features {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 60px;
+        }
+        .feature-row {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
+        .feature {
+            margin: 10px;
+            text-align: center;
+            flex: 1;
+        }
+        .feature i {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        .footer {
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            text-align: center;
+            padding: 5px 0;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <div class="jumbotron text-center">
-      <h1>Multi-Functional App</h1>
-      <p>Weather, News, and Social Media</p>
+    <div class="bg">
+        <div class="welcome-text">
+            <h1>Welcome to Multi-Functional App</h1>
+            <p>Your gateway to current weather, latest news in Malaysia, and Reddit posts.</p>
+        </div>
+        <div class="features">
+            <div class="feature-row">
+                <div class="feature">
+                    <i class="fas fa-cloud-sun"></i>
+                    <h3>Current Weather</h3>
+                    <p>Get the latest weather updates for your location.</p>
+                </div>
+                <div class="feature">
+                    <i class="fa fa-newspaper-o"></i>
+                    <h3>Latest News</h3>
+                    <p>Stay informed with the latest news in Malaysia.</p>
+                </div>
+            </div>
+            <div class="feature">
+                <i class="fab fa-reddit-alien"></i>
+                <h3>Reddit Posts</h3>
+                <p>Explore trending posts from Reddit.</p>
+            </div>
+        </div>
+        <div class="footer">
+            <p>&copy; 2024 Multi-Functional App. All rights reserved.</p>
+        </div>
     </div>
-    <div class="main-menu text-center">
-      <a href="weather.html" class="btn btn-primary">Weather</a>
-      <a href="news.html" class="btn btn-primary">News</a>
-      <a href="social.html" class="btn btn-primary">Social Media</a>
-      <a href="interaction-log.html" class="btn btn-primary">Interaction Logging</a>
-    </div>
-  </div>
-  <!-- Testing purpose -->
-  <!-- <script>localStorage.clear();</script> -->
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-  <script>
-    // Unified logging function
-    function logInteraction(type, action, error = null) {
-      const interactions = JSON.parse(localStorage.getItem('interactions')) || [];
-      const index = interactions.length; // Use the length of the array as the index
-      const interaction = {
-        index: index,
-        action: error ? `[${type}] ${action}: ${error}` : `[${type}] ${action}`,
-        timestamp: new Date().toISOString()
-      };
-      interactions.push(interaction);
-      localStorage.setItem('interactions', JSON.stringify(interactions));
-    }
+    <script>
+        function logInteraction(type, action) {
+            const interactions = JSON.parse(localStorage.getItem('interactions')) || [];
+            const index = interactions.length; // Use the length of the array as the index
+            const interaction = {
+                index: index,
+                action: `[${type}] ${action}`,
+                timestamp: new Date().toISOString()
+            };
+            interactions.push(interaction);
+            localStorage.setItem('interactions', JSON.stringify(interactions));
+        }
 
-    // Log page load
-    document.addEventListener('DOMContentLoaded', () => {
-      logInteraction('MAIN PAGE', 'Main menu page loaded');
-    });
-
-    // Log menu button clicks
-    document.querySelectorAll('.main-menu .btn').forEach(button => {
-      button.addEventListener('click', (event) => {
-        logInteraction('USER', `Clicked ${event.target.textContent} button`);
-      });
-    });
-  </script>
+        // Log page load
+        document.addEventListener('DOMContentLoaded', () => {
+            logInteraction('HOME PAGE', 'Home page loaded');
+        });
+    </script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
