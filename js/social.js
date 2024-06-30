@@ -102,33 +102,54 @@ document.addEventListener('DOMContentLoaded', () => {
     const start = (page - 1) * pageSize;
     const end = start + pageSize;
     const pagePosts = postsData.slice(start, end);
-
+  
     let postsHTML = '';
     for (const post of pagePosts) {
       const createdAt = moment.unix(post.data.created_utc).format('MMMM Do YYYY, h:mm a');
-      const imageUrl = post.data.thumbnail && post.data.thumbnail.startsWith('http') ? post.data.thumbnail : null;
-      const url = post.data.url;
-
-      const imageHTML = imageUrl ? `<img src="${imageUrl}" alt="Post Image" onerror="this.style.display='none';">` : '';
-
+      let imageUrl = null;
+      let postUrl = post.data.url;
+  
+      // Ensure the URL is from Reddit
+      if (!postUrl.includes('reddit.com')) {
+        postUrl = `https://www.reddit.com${post.data.permalink}`;
+      }
+  
+      // Check for image preview
+      if (post.data.preview && post.data.preview.images && post.data.preview.images[0].source.url) {
+        imageUrl = post.data.preview.images[0].source.url.replace(/&amp;/g, '&');
+      } 
+      // Check for direct image link
+      else if (post.data.url && post.data.url.startsWith('https://i.redd.it')) {
+        imageUrl = post.data.url;
+      } 
+      // Use thumbnail as a last resort
+      else if (post.data.thumbnail && post.data.thumbnail.startsWith('http')) {
+        imageUrl = post.data.thumbnail;
+      }
+  
+      let mediaHTML = '';
+      if (imageUrl) {
+        mediaHTML = `<img src="${imageUrl}" alt="Post Image" onerror="this.style.display='none';">`;
+      }
+  
       postsHTML += `
         <div class="col-md-6">
           <div class="card">
-            ${imageHTML}
+            ${mediaHTML}
             <div class="card-body">
               <h5 class="card-title">${post.data.title}</h5>
               <p class="card-text">${post.data.selftext_html ? sanitizeHTML(post.data.selftext_html) : ''}</p>
-              <a href="${url}" target="_blank" class="btn btn-primary read-more-btn">Read more</a>
+              <a href="${postUrl}" target="_blank" class="btn btn-primary read-more-btn">Read more</a>
               <p class="card-text"><small class="text-muted">Posted at: ${createdAt} | Upvotes: ${post.data.ups}</small></p>
             </div>
           </div>
         </div>
       `;
     }
-
+  
     content.innerHTML = postsHTML;
     updatePaginationControls();
-
+  
     document.querySelectorAll('.read-more-btn').forEach(button => {
       button.addEventListener('click', (event) => {
         const cardBody = event.target.parentElement;
@@ -138,6 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
   }
+  
 
   function updatePaginationControls() {
     const totalPages = Math.ceil(postsData.length / pageSize);
