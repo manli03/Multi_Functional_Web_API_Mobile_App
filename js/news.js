@@ -1,7 +1,14 @@
-const newsApiKey = 'bzgjvaNFUjA34_M75EwWRUWu-dr0mOPX9FtUTb-XibuXVtr7';
+let newsApiKey;
 const pageSize = 20;
 let currentPage = 1;
 let newsData = [];
+
+// Fetch the API key and set the global variable
+fetch('/.netlify/functions/fetchData')
+  .then(response => response.json())
+  .then(data => {
+    newsApiKey = data.apiKey2;
+  });
 
 document.addEventListener('DOMContentLoaded', () => {
   const loading = document.getElementById('loading');

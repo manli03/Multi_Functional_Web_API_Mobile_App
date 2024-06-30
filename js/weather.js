@@ -1,4 +1,12 @@
-const weatherApiKey = 'bd5e378503939ddaee76f12ad7a97608';
+// Declare a global variable for the API key
+let weatherApiKey;
+
+// Fetch the API key and set the global variable
+fetch('/.netlify/functions/fetchData')
+  .then(response => response.json())
+  .then(data => {
+    weatherApiKey = data.apiKey1;
+  });
 
 document.addEventListener('DOMContentLoaded', () => {
   const loading = document.getElementById('loading');
