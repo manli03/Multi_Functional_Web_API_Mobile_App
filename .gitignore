@@ -16,6 +16,8 @@ dependency-reduced-pom.xml
 *.txt
 *.ser
 .env
+.vscode
+
 # Local Netlify folder
 .netlify
 node_modules/
