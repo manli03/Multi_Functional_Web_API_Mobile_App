@@ -1,4 +1,3 @@
-let newsApiKey; 
 const pageSize = 20;
 let currentPage = 1;
 let newsData = [];
@@ -51,24 +50,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
   logInteraction('NEWS', 'Page loaded');
 
+  // Fetches news data from API
   function fetchNews(keyword = '', category = '', language = 'en') {
     loading.style.display = 'block';
     content.style.display = 'none';
     paginationTop.style.display = 'none';
     paginationBottom.style.display = 'none';
 
-    let url = `https://api.currentsapi.services/v1/search?country=my&page_size=200&apiKey=${newsApiKey}`;
-    if (keyword) {
-      url += `&keywords=${encodeURIComponent(keyword)}`;
-    }
-    if (category) {
-      url += `&category=${encodeURIComponent(category)}`;
-    }
-    if (language) {
-      url += `&language=${encodeURIComponent(language)}`;
-    }
+    fetchToken().then(token => {
+      let url = `/.netlify/functions/fetchNewsData?country=my&page_size=200`;
+      if (keyword) url += `&keywords=${encodeURIComponent(keyword)}`;
+      if (category) url += `&category=${encodeURIComponent(category)}`;
+      if (language) url += `&language=${encodeURIComponent(language)}`;
 
-    fetch(url)
+      fetch(url, {
+        method: 'GET',
+        headers: { 'Authorization': token } // Use the token to fetch the API data
+      })
       .then(response => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -96,7 +94,20 @@ document.addEventListener('DOMContentLoaded', () => {
         content.style.display = 'flex';
         content.innerHTML = `<p class="text-danger">${error.message}</p>`;
       });
+    });
   }
+
+  // Fetches a single use token for authentication
+  function fetchToken() {
+    return fetch('/.netlify/functions/generateToken', { method: 'POST' })
+      .then(response => response.json())
+      .then(tokenData => tokenData.token)
+      .catch(error => {
+        logInteraction('NEWS', 'Error generating token', error.message);
+        throw new Error('Token generation failed');
+      });
+  }
+
 
   function handleSearch() {
     const keyword = searchInput.value;

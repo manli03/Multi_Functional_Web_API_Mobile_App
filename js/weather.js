@@ -1,28 +1,3 @@
-// Declare a global variable for the API key
-let weatherApiKey;
-
-// Fetch a single-use token
-fetch('/.netlify/functions/generateToken', { method: 'POST' })
-  .then(response => response.json())
-  .then(tokenData => {
-    const token = tokenData.token;
-
-    // Use the token to fetch the API key
-    fetch('/.netlify/functions/fetchData', {
-      method: 'GET',
-      headers: {
-        'Authorization': token
-      }
-    })
-    .then(response => response.json())
-    .then(data => {
-      weatherApiKey = data.apiKey1;
-    })
-    .catch(error => logInteraction('WEATHER', 'Error fetching weather API key', error.message));
-  })
-  .catch(error => logInteraction('WEATHER', 'Error generating token', error.message));
-
-
 document.addEventListener('DOMContentLoaded', () => {
   const loading = document.getElementById('loading');
   const content = document.getElementById('content');
@@ -122,26 +97,91 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Fetches weather data using the city name.
   function fetchWeatherDataByCity(city) {
-    const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${weatherApiKey}`;
-    fetch(url)
+    fetchToken().then(token => {
+      fetch(`/.netlify/functions/fetchWeatherData?city=${city}`, {
+        method: 'GET',
+        headers: { 'Authorization': token }
+      })
       .then(response => handleFetchResponse(response))
       .then(data => {
         displayWeatherData(data);
         fetchWeatherForecast(data.coord.lat, data.coord.lon);
       })
       .catch(error => handleError(error));
+    });
   }
 
   // Fetches weather data using latitude and longitude.
   function fetchWeatherData(latitude, longitude) {
-    const url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${weatherApiKey}`;
-    fetch(url)
+    fetchToken().then(token => {
+      fetch(`/.netlify/functions/fetchWeatherData?lat=${latitude}&lon=${longitude}`, {
+        method: 'GET',
+        headers: { 'Authorization': token } // Use the token to fetch the API data
+      })
       .then(response => handleFetchResponse(response))
       .then(data => {
         displayWeatherData(data);
         fetchWeatherForecast(data.coord.lat, data.coord.lon);
       })
       .catch(error => handleError(error));
+    });
+  }
+
+  // Fetches and displays the 7-day weather forecast.
+  function fetchWeatherForecast(latitude, longitude) {
+    fetchToken().then(token => {
+      fetch(`/.netlify/functions/fetchWeatherData?lat=${latitude}&lon=${longitude}&forecast=true`, {
+        method: 'GET',
+        headers: { 'Authorization': token } // Use the token to fetch the API data
+      })
+      .then(response => handleFetchResponse(response))
+      .then(data => {
+        logInteraction('WEATHER', 'Fetched weather forecast from API');
+        forecast.style.display = 'block';
+
+        let dailyHTML = '<h3>7-Day Forecast</h3><div class="forecast-container">';
+        const todayDate = moment().startOf('day');
+
+        data.daily.forEach((day, index) => {
+          if (index < 7) {
+            const date = moment.unix(day.dt).format('MMMM Do');
+            const tempDay = (day.temp.day - 273.15).toFixed(2);
+            const tempNight = (day.temp.night - 273.15).toFixed(2);
+            const description = day.weather[0].description;
+            const icon = day.weather[0].icon;
+            const isToday = moment.unix(day.dt).startOf('day').isSame(todayDate);
+
+            dailyHTML += `
+              <div class="forecast-card ${isToday ? 'today-forecast' : ''}" onclick="showHourlyForecast(${index})">
+                <h5>${date}</h5>
+                <img src="http://openweathermap.org/img/wn/${icon}@2x.png" alt="Weather icon">
+                <p>Day: ${tempDay} °C</p>
+                <p>Night: ${tempNight} °C</p>
+                <p>${description}</p>
+              </div>
+            `;
+          }
+        });
+
+        dailyHTML += '</div>';
+        dailyForecast.innerHTML = dailyHTML;
+        dailyForecast.style.display = 'block';
+        window.hourlyData = data.hourly;
+        window.hourlyDataFull = data.hourly;
+      })
+      .catch(error => handleError(error));
+    });
+  }
+
+  // Fetches a single use token for authentication
+  function fetchToken() {
+    return fetch('/.netlify/functions/generateToken', { method: 'POST' })
+      .then(response => response.json())
+      .then(tokenData => tokenData.token)
+      .catch(error => {
+        logInteraction('WEATHER', 'Error generating token', error.message);
+        throw new Error('Token generation failed');
+      });
   }
 
   // Handles the API response and checks for errors.
@@ -222,51 +262,6 @@ document.addEventListener('DOMContentLoaded', () => {
     showNotification('Weather data updated');
     updateLastFetchTime();
   }  
-
-  // Fetches and displays the 7-day weather forecast.
-  function fetchWeatherForecast(latitude, longitude) {
-    const url = `https://api.openweathermap.org/data/2.5/onecall?lat=${latitude}&lon=${longitude}&exclude=minutely&appid=${weatherApiKey}`;
-
-    fetch(url)
-      .then(response => handleFetchResponse(response))
-      .then(data => {
-        logInteraction('WEATHER', 'Fetched weather forecast from API');
-        forecast.style.display = 'block';
-
-        let dailyHTML = '<h3>7-Day Forecast</h3><div class="forecast-container">';
-        const todayDate = moment().startOf('day');
-
-        data.daily.forEach((day, index) => {
-          if (index < 7) {  // Only take the first 7 days
-            const date = moment.unix(day.dt).format('MMMM Do');
-            const tempDay = (day.temp.day - 273.15).toFixed(2); // Convert from Kelvin to Celsius
-            const tempNight = (day.temp.night - 273.15).toFixed(2);
-            const description = day.weather[0].description;
-            const icon = day.weather[0].icon;
-
-            const isToday = moment.unix(day.dt).startOf('day').isSame(todayDate);
-
-            dailyHTML += `
-              <div class="forecast-card ${isToday ? 'today-forecast' : ''}" onclick="showHourlyForecast(${index})">
-                <h5>${date}</h5>
-                <img src="http://openweathermap.org/img/wn/${icon}@2x.png" alt="Weather icon">
-                <p>Day: ${tempDay} °C</p>
-                <p>Night: ${tempNight} °C</p>
-                <p>${description}</p>
-              </div>
-            `;
-          }
-        });
-
-        dailyHTML += '</div>';
-        dailyForecast.innerHTML = dailyHTML;
-        dailyForecast.style.display = 'block';
-
-        window.hourlyData = data.hourly;
-        window.hourlyDataFull = data.hourly;
-      })
-      .catch(error => handleError(error));
-  }
 
   // Displays the hourly forecast for the selected day.
   window.showHourlyForecast = function(dayIndex) {
