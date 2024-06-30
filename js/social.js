@@ -24,18 +24,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
   logInteraction('SOCIAL', 'Page loaded');
 
+  // Fetches post from API
   function fetchPosts(query = '') {
     loading.style.display = 'block';
     content.style.display = 'none';
     paginationTop.style.display = 'none';
     paginationBottom.style.display = 'none';
 
-    let url = `https://www.reddit.com/r/malaysia/top/.json?limit=100`;
-    if (query) {
-      url = `https://www.reddit.com/search.json?q=${encodeURIComponent(query)}&limit=100`;
-    }
+    fetchToken().then(token => {
+      let url = `/.netlify/functions/fetchSocialData`;
+      if (query) {
+        url += `?query=${encodeURIComponent(query)}`;
+      }
 
-    fetch(url)
+      fetch(url, {
+        method: 'GET',
+        headers: { 'Authorization': token } // Use the token to fetch the API data
+      })
       .then(response => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -58,6 +63,18 @@ document.addEventListener('DOMContentLoaded', () => {
         loading.style.display = 'none';
         content.style.display = 'flex';
         content.innerHTML = `<p class="text-danger">${error.message}</p>`;
+      });
+    });
+  }
+
+  // Fetches a single use token for authentication
+  function fetchToken() {
+    return fetch('/.netlify/functions/generateToken', { method: 'POST' })
+      .then(response => response.json())
+      .then(tokenData => tokenData.token)
+      .catch(error => {
+        logInteraction('SOCIAL', 'Error generating token', error.message);
+        throw new Error('Token generation failed');
       });
   }
 
