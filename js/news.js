@@ -3,12 +3,27 @@ const pageSize = 20;
 let currentPage = 1;
 let newsData = [];
 
-// Fetch the API key and set the global variable
-fetch('/.netlify/functions/fetchData')
+// Fetch a single-use token
+fetch('/.netlify/functions/generateToken', { method: 'POST' })
   .then(response => response.json())
-  .then(data => {
-    newsApiKey = data.apiKey2;
-  });
+  .then(tokenData => {
+    const token = tokenData.token;
+
+    // Use the token to fetch the API key
+    fetch('/.netlify/functions/fetchData', {
+      method: 'GET',
+      headers: {
+        'Authorization': token
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      newsApiKey = data.apiKey2;
+    })
+    .catch(error => logInteraction('NEWS', 'Error fetching news API key', error.message));
+  })
+  .catch(error => logInteraction('NEWS', 'Error generating token', error.message));
+
 
 document.addEventListener('DOMContentLoaded', () => {
   const loading = document.getElementById('loading');

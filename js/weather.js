@@ -1,12 +1,27 @@
 // Declare a global variable for the API key
 let weatherApiKey;
 
-// Fetch the API key and set the global variable
-fetch('/.netlify/functions/fetchData')
+// Fetch a single-use token
+fetch('/.netlify/functions/generateToken', { method: 'POST' })
   .then(response => response.json())
-  .then(data => {
-    weatherApiKey = data.apiKey1;
-  });
+  .then(tokenData => {
+    const token = tokenData.token;
+
+    // Use the token to fetch the API key
+    fetch('/.netlify/functions/fetchData', {
+      method: 'GET',
+      headers: {
+        'Authorization': token
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      weatherApiKey = data.apiKey1;
+    })
+    .catch(error => logInteraction('WEATHER', 'Error fetching weather API key', error.message));
+  })
+  .catch(error => logInteraction('WEATHER', 'Error generating token', error.message));
+
 
 document.addEventListener('DOMContentLoaded', () => {
   const loading = document.getElementById('loading');
