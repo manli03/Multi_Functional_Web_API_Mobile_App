@@ -1,9 +1,10 @@
 const jwt = require('jsonwebtoken');
-const fetch = require('node-fetch');
 
 const allowedReferrer = 'https://multifunctionalapp.netlify.app';
 
 exports.handler = async (event, context) => {
+  const fetch = (await import('node-fetch')).default;
+
   const { authorization: token } = event.headers;
   const referrer = event.headers.referer || '';
   const { keyword = '', category = '', language = 'en' } = event.queryStringParameters || {};
@@ -24,6 +25,9 @@ exports.handler = async (event, context) => {
     if (language) url += `&language=${encodeURIComponent(language)}`;
 
     const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Error fetching data from Currents API: ${response.statusText}`);
+    }
     const data = await response.json();
     return { statusCode: 200, body: JSON.stringify(data) };
 
