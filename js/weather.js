@@ -97,71 +97,91 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Fetches weather data using the city name.
   function fetchWeatherDataByCity(city) {
-    fetch(`/.netlify/functions/fetchWeatherData?city=${city}`, {
-      method: 'GET',
-    })
-    .then(response => handleFetchResponse(response))
-    .then(data => {
-      displayWeatherData(data);
-      fetchWeatherForecast(data.coord.lat, data.coord.lon);
-    })
-    .catch(error => handleError(error));
+    fetchToken().then(token => {
+      fetch(`/.netlify/functions/fetchWeatherData?city=${city}`, {
+        method: 'GET',
+        headers: { 'Authorization': token }
+      })
+      .then(response => handleFetchResponse(response))
+      .then(data => {
+        displayWeatherData(data);
+        fetchWeatherForecast(data.coord.lat, data.coord.lon);
+      })
+      .catch(error => handleError(error));
+    });
   }
 
   // Fetches weather data using latitude and longitude.
   function fetchWeatherData(latitude, longitude) {
-    fetch(`/.netlify/functions/fetchWeatherData?lat=${latitude}&lon=${longitude}`, {
-      method: 'GET',
-    })
-    .then(response => handleFetchResponse(response))
-    .then(data => {
-      displayWeatherData(data);
-      fetchWeatherForecast(data.coord.lat, data.coord.lon);
-    })
-    .catch(error => handleError(error));
+    fetchToken().then(token => {
+      fetch(`/.netlify/functions/fetchWeatherData?lat=${latitude}&lon=${longitude}`, {
+        method: 'GET',
+        headers: { 'Authorization': token } // Use the token to fetch the API data
+      })
+      .then(response => handleFetchResponse(response))
+      .then(data => {
+        displayWeatherData(data);
+        fetchWeatherForecast(data.coord.lat, data.coord.lon);
+      })
+      .catch(error => handleError(error));
+    });
   }
 
   // Fetches and displays the 7-day weather forecast.
   function fetchWeatherForecast(latitude, longitude) {
-    fetch(`/.netlify/functions/fetchWeatherData?lat=${latitude}&lon=${longitude}&forecast=true`, {
-      method: 'GET',
-    })
-    .then(response => handleFetchResponse(response))
-    .then(data => {
-      logInteraction('WEATHER', 'Fetched weather forecast from API');
-      forecast.style.display = 'block';
+    fetchToken().then(token => {
+      fetch(`/.netlify/functions/fetchWeatherData?lat=${latitude}&lon=${longitude}&forecast=true`, {
+        method: 'GET',
+        headers: { 'Authorization': token } // Use the token to fetch the API data
+      })
+      .then(response => handleFetchResponse(response))
+      .then(data => {
+        logInteraction('WEATHER', 'Fetched weather forecast from API');
+        forecast.style.display = 'block';
 
-      let dailyHTML = '<h3>7-Day Forecast</h3><div class="forecast-container">';
-      const todayDate = moment().startOf('day');
+        let dailyHTML = '<h3>7-Day Forecast</h3><div class="forecast-container">';
+        const todayDate = moment().startOf('day');
 
-      data.daily.forEach((day, index) => {
-        if (index < 7) {
-          const date = moment.unix(day.dt).format('MMMM Do');
-          const tempDay = (day.temp.day - 273.15).toFixed(2);
-          const tempNight = (day.temp.night - 273.15).toFixed(2);
-          const description = day.weather[0].description;
-          const icon = day.weather[0].icon;
-          const isToday = moment.unix(day.dt).startOf('day').isSame(todayDate);
+        data.daily.forEach((day, index) => {
+          if (index < 7) {
+            const date = moment.unix(day.dt).format('MMMM Do');
+            const tempDay = (day.temp.day - 273.15).toFixed(2);
+            const tempNight = (day.temp.night - 273.15).toFixed(2);
+            const description = day.weather[0].description;
+            const icon = day.weather[0].icon;
+            const isToday = moment.unix(day.dt).startOf('day').isSame(todayDate);
 
-          dailyHTML += `
-            <div class="forecast-card ${isToday ? 'today-forecast' : ''}" onclick="showHourlyForecast(${index})">
-              <h5>${date}</h5>
-              <img src="https://openweathermap.org/img/wn/${icon}@2x.png" alt="Weather icon">
-              <p>Day: ${tempDay} °C</p>
-              <p>Night: ${tempNight} °C</p>
-              <p>${description}</p>
-            </div>
-          `;
-        }
+            dailyHTML += `
+              <div class="forecast-card ${isToday ? 'today-forecast' : ''}" onclick="showHourlyForecast(${index})">
+                <h5>${date}</h5>
+                <img src="https://openweathermap.org/img/wn/${icon}@2x.png" alt="Weather icon">
+                <p>Day: ${tempDay} °C</p>
+                <p>Night: ${tempNight} °C</p>
+                <p>${description}</p>
+              </div>
+            `;
+          }
+        });
+
+        dailyHTML += '</div>';
+        dailyForecast.innerHTML = dailyHTML;
+        dailyForecast.style.display = 'block';
+        window.hourlyData = data.hourly;
+        window.hourlyDataFull = data.hourly;
+      })
+      .catch(error => handleError(error));
+    });
+  }
+
+  // Fetches a single use token for authentication
+  function fetchToken() {
+    return fetch('/.netlify/functions/generateToken', { method: 'POST' })
+      .then(response => response.json())
+      .then(tokenData => tokenData.token)
+      .catch(error => {
+        logInteraction('WEATHER', 'Error generating token', error.message);
+        throw new Error('Token generation failed');
       });
-
-      dailyHTML += '</div>';
-      dailyForecast.innerHTML = dailyHTML;
-      dailyForecast.style.display = 'block';
-      window.hourlyData = data.hourly;
-      window.hourlyDataFull = data.hourly;
-    })
-    .catch(error => handleError(error));
   }
 
   // Handles the API response and checks for errors.
