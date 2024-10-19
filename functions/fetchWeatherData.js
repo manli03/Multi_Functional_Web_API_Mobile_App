@@ -1,27 +1,19 @@
-const jwt = require('jsonwebtoken');
-
 const allowedReferrer = 'https://multifunctionalapp.netlify.app';
 
 exports.handler = async (event, context) => {
   const fetch = (await import('node-fetch')).default;
 
-  const { authorization: token } = event.headers;
   const referrer = event.headers.referer || '';
 
   const { city, lat, lon, forecast } = event.queryStringParameters || {};
   console.log('Query params:', { city, lat, lon, forecast });
 
-  if (!token || !referrer.startsWith(allowedReferrer)) {
+  // Check referrer without token validation
+  if (!referrer.startsWith(allowedReferrer)) {
     return { statusCode: 401, body: 'Unauthorized or Invalid Referrer' };
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log('Decoded token:', decoded);
-    if (!decoded.singleUse) {
-      return { statusCode: 403, body: 'Forbidden: Token already used' };
-    }
-
     let url;
     if (city) {
       url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${process.env.API_KEY_1}`;
