@@ -154,7 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
             dailyHTML += `
               <div class="forecast-card ${isToday ? 'today-forecast' : ''}" onclick="showHourlyForecast(${index})">
                 <h5>${date}</h5>
-                <img src="https://openweathermap.org/img/wn/${icon}@2x.png" alt="Weather icon">
+                <img src="http://openweathermap.org/img/wn/${icon}@2x.png" alt="Weather icon">
                 <p>Day: ${tempDay} °C</p>
                 <p>Night: ${tempNight} °C</p>
                 <p>${description}</p>
@@ -221,7 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="weather-card animated fadeIn">
         <h2>Weather in ${data.name}</h2>
         <p><strong>${todayDate}</strong></p>
-        <img src="https://openweathermap.org/img/wn/${icon}@2x.png" alt="Weather icon" class="weather-icon">
+        <img src="http://openweathermap.org/img/wn/${icon}@2x.png" alt="Weather icon" class="weather-icon">
         <p><i class="fas fa-thermometer-half"></i> Temperature: ${temperature} °C</p>
         <p><i class="fas fa-thermometer"></i> Feels Like: ${feelsLike} °C</p>
         <p><i class="fas fa-cloud"></i> Condition: ${weatherDescription}</p>
@@ -294,7 +294,7 @@ document.addEventListener('DOMContentLoaded', () => {
         hourlyHTML += `
           <div class="hourly-card">
             <h6>${hourTime}</h6>
-            <img src="https://openweathermap.org/img/wn/${hourIcon}@2x.png" alt="Weather icon">
+            <img src="http://openweathermap.org/img/wn/${hourIcon}@2x.png" alt="Weather icon">
             <p>${hourTemp} °C</p>
           </div>
         `;
