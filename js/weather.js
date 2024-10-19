@@ -181,6 +181,112 @@ document.addEventListener('DOMContentLoaded', () => {
     content.innerHTML = '<p class="text-danger">Failed to load data. Please try again later.</p>';
   }
 
+  // Displays the current weather data.
+  function displayWeatherData(data) {
+    hideLoading();
+    content.style.display = 'block';
+  
+    const todayDate = moment().format('MMMM Do, YYYY');
+    const temperature = (data.main.temp - 273.15).toFixed(2);
+    const feelsLike = (data.main.feels_like - 273.15).toFixed(2);
+    const weatherDescription = data.weather[0].description;
+    const humidity = data.main.humidity;
+    const windSpeed = data.wind.speed;
+    const visibility = data.visibility / 1000;
+    const sunrise = moment.unix(data.sys.sunrise).format('h:mm:ss a');
+    const sunset = moment.unix(data.sys.sunset).format('h:mm:ss a');
+    const icon = data.weather[0].icon;
+  
+    content.innerHTML = `
+      <div class="weather-card animated fadeIn">
+        <h2>Weather in ${data.name}</h2>
+        <p><strong>${todayDate}</strong></p>
+        <img src="https://openweathermap.org/img/wn/${icon}@2x.png" alt="Weather icon" class="weather-icon">
+        <p><i class="fas fa-thermometer-half"></i> Temperature: ${temperature} °C</p>
+        <p><i class="fas fa-thermometer"></i> Feels Like: ${feelsLike} °C</p>
+        <p><i class="fas fa-cloud"></i> Condition: ${weatherDescription}</p>
+        <p><i class="fas fa-tint"></i> Humidity: ${humidity}%</p>
+        <p><i class="fas fa-wind"></i> Wind Speed: ${windSpeed} m/s</p>
+        <p><i class="fas fa-eye"></i> Visibility: ${visibility} km</p>
+        <p><i class="fas fa-sun"></i> Sunrise: ${sunrise}</p>
+        <p><i class="fas fa-moon"></i> Sunset: ${sunset}</p>
+        <canvas id="weatherChart" width="400" height="200"></canvas>
+      </div>
+    `;
+  
+    const ctx = document.getElementById('weatherChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Temperature', 'Feels Like'],
+        datasets: [{
+          label: 'Temperature (°C)',
+          data: [temperature, feelsLike],
+          backgroundColor: ['rgba(75, 192, 192, 0.2)', 'rgba(153, 102, 255, 0.2)'],
+          borderColor: ['rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)'],
+          borderWidth: 1
+        }]
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+  
+    const now = new Date().toISOString();
+    localStorage.setItem('lastFetchTimestamp', now);
+    logInteraction('WEATHER', 'Created weather chart');
+    showNotification('Weather data updated');
+    updateLastFetchTime();
+  }  
+
+  // Displays the hourly forecast for the selected day.
+  window.showHourlyForecast = function(dayIndex) {
+    const start = dayIndex * 24;
+    const end = start + 24;
+    const hourlyData = window.hourlyDataFull.slice(start, end);
+  
+    // Remove the 'selected' class from all forecast cards
+    document.querySelectorAll('.forecast-card').forEach(card => {
+      card.classList.remove('selected');
+    });
+  
+    // Add the 'selected' class to the clicked card
+    const selectedCard = document.querySelectorAll('.forecast-card')[dayIndex];
+    selectedCard.classList.add('selected');
+  
+    // Auto scroll to center the selected card
+    selectedCard.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+  
+    let hourlyHTML = '<h3>Hourly Forecast</h3><div class="hourly-forecast">';
+  
+    if (hourlyData.length === 0) {
+      hourlyHTML += '<p class="no-data">No data available for this day.</p>';
+    } else {
+      hourlyData.forEach(hour => {
+        const hourTime = moment.unix(hour.dt).format('HH:mm');
+        const hourTemp = (hour.temp - 273.15).toFixed(2);
+        const hourIcon = hour.weather[0].icon;
+  
+        hourlyHTML += `
+          <div class="hourly-card">
+            <h6>${hourTime}</h6>
+            <img src="https://openweathermap.org/img/wn/${hourIcon}@2x.png" alt="Weather icon">
+            <p>${hourTemp} °C</p>
+          </div>
+        `;
+      });
+    }
+  
+    hourlyHTML += '</div>';
+    hourlyForecast.innerHTML = hourlyHTML;
+    hourlyForecast.style.display = 'block';
+  };
+  
+
   // Fetches the user's current location.
   function getUserLocation() {
     const locationTimeout = setTimeout(() => {
@@ -226,7 +332,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   updateLastFetchTime();
 });
-
 
 
 
