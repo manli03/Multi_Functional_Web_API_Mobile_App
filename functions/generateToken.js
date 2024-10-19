@@ -3,13 +3,13 @@ const jwt = require('jsonwebtoken');
 const allowedReferrer = 'https://multifunctionalapp.netlify.app';  // Change this to your actual domain
 
 exports.handler = async (event, context) => {
-  const referrer = event.headers.referer || '';
-
-  // If the referrer is not allowed, return forbidden status
-  if (!referrer.startsWith(allowedReferrer)) {
-    console.error('Invalid referrer:', referrer);
-    return { statusCode: 403, body: 'Forbidden' };
+  const allowedReferrers = ['https://multifunctionalapp.netlify.app', 'http://localhost:3000'];
+  
+  if (!allowedReferrers.some(allowed => referrer.startsWith(allowed))) {
+      console.error('Invalid referrer:', referrer);
+      return { statusCode: 403, body: 'Forbidden' };
   }
+
 
   try {
     // Create a token with a short expiration time (e.g., 5 minutes)
@@ -17,6 +17,10 @@ exports.handler = async (event, context) => {
 
     return {
       statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': allowedReferrer, // Set to your front-end domain
+        'Access-Control-Allow-Headers': 'Content-Type',
+      },
       body: JSON.stringify({ token }),
     };
   } catch (error) {
