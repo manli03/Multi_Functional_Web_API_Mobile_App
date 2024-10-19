@@ -8,8 +8,8 @@ exports.handler = async (event, context) => {
   const { authorization: token } = event.headers;
   const referrer = event.headers.referer || '';
 
-  // Extract query parameters
   const { city, lat, lon, forecast } = event.queryStringParameters || {};
+  console.log('Query params:', { city, lat, lon, forecast });
 
   if (!token || !referrer.startsWith(allowedReferrer)) {
     return { statusCode: 401, body: 'Unauthorized or Invalid Referrer' };
@@ -17,6 +17,7 @@ exports.handler = async (event, context) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log('Decoded token:', decoded);
     if (!decoded.singleUse) {
       return { statusCode: 403, body: 'Forbidden: Token already used' };
     }
@@ -34,9 +35,12 @@ exports.handler = async (event, context) => {
       return { statusCode: 400, body: 'Bad Request: Missing required parameters' };
     }
 
+    console.log('Constructed URL:', url);
+
     const response = await fetch(url);
     if (!response.ok) {
-      throw new Error(`Error fetching data from OpenWeatherMap: ${response.statusText}`);
+      const errorText = await response.text();
+      throw new Error(`Error fetching data from OpenWeatherMap: ${response.status} ${errorText}`);
     }
     const data = await response.json();
     return { statusCode: 200, body: JSON.stringify(data) };

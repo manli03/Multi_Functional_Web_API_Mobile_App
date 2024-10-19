@@ -175,20 +175,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Fetches a single use token for authentication
   function fetchToken() {
-  return fetch('/.netlify/functions/generateToken', { method: 'POST' })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      return response.json();
-    })
-    .then(tokenData => tokenData.token)
-    .catch(error => {
-      logInteraction('WEATHER', 'Error generating token', error.message);
-      throw new Error('Token generation failed');
-    });
-}
-
+    return fetch('/.netlify/functions/generateToken', { method: 'POST' })
+      .then(response => response.json())
+      .then(tokenData => tokenData.token)
+      .catch(error => {
+        logInteraction('WEATHER', 'Error generating token', error.message);
+        throw new Error('Token generation failed');
+      });
+  }
 
   // Handles the API response and checks for errors.
   function handleFetchResponse(response) {
