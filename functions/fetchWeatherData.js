@@ -26,8 +26,8 @@ exports.handler = async (event, context) => {
       url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${process.env.API_KEY_1}`;
     } else if (lat && lon) {
       if (forecast === 'true') {
-        url = `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&exclude=minutely&appid=${process.env.API_KEY_1}`;
-      } else {
+        url = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${process.env.API_KEY_1}`;
+      } else { //use location coordinate
         url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${process.env.API_KEY_1}`;
       }
     } else {

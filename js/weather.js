@@ -102,12 +102,12 @@ document.addEventListener('DOMContentLoaded', () => {
         method: 'GET',
         headers: { 'Authorization': token }
       })
-      .then(response => handleFetchResponse(response))
-      .then(data => {
-        displayWeatherData(data);
-        fetchWeatherForecast(data.coord.lat, data.coord.lon);
-      })
-      .catch(error => handleError(error));
+        .then(response => handleFetchResponse(response))
+        .then(data => {
+          displayWeatherData(data);
+          fetchWeatherForecast(data.coord.lat, data.coord.lon);
+        })
+        .catch(error => handleError(error));
     });
   }
 
@@ -118,60 +118,72 @@ document.addEventListener('DOMContentLoaded', () => {
         method: 'GET',
         headers: { 'Authorization': token } // Use the token to fetch the API data
       })
-      .then(response => handleFetchResponse(response))
-      .then(data => {
-        displayWeatherData(data);
-        fetchWeatherForecast(data.coord.lat, data.coord.lon);
-      })
-      .catch(error => handleError(error));
+        .then(response => handleFetchResponse(response))
+        .then(data => {
+          displayWeatherData(data);
+          fetchWeatherForecast(data.coord.lat, data.coord.lon);
+        })
+        .catch(error => handleError(error));
     });
   }
 
-  // Fetches and displays the 7-day weather forecast.
+  // Fetches and displays the 3-hour Forecast 5 days.
   function fetchWeatherForecast(latitude, longitude) {
     fetchToken().then(token => {
       fetch(`/.netlify/functions/fetchWeatherData?lat=${latitude}&lon=${longitude}&forecast=true`, {
         method: 'GET',
         headers: { 'Authorization': token } // Use the token to fetch the API data
       })
-      .then(response => handleFetchResponse(response))
-      .then(data => {
-        logInteraction('WEATHER', 'Fetched weather forecast from API');
-        forecast.style.display = 'block';
+        .then(response => handleFetchResponse(response))
+        .then(data => {
+          logInteraction('WEATHER', 'Fetched 3-hour forecast from API');
+          forecast.style.display = 'block';
 
-        let dailyHTML = '<h3>7-Day Forecast</h3><div class="forecast-container">';
-        const todayDate = moment().startOf('day');
+          let forecastHTML = '<h3>3-Hour Forecast for 5 Days</h3><div class="forecast-container">';
+          const groupedByDay = {};
 
-        data.daily.forEach((day, index) => {
-          if (index < 7) {
-            const date = moment.unix(day.dt).format('MMMM Do');
-            const tempDay = (day.temp.day - 273.15).toFixed(2);
-            const tempNight = (day.temp.night - 273.15).toFixed(2);
-            const description = day.weather[0].description;
-            const icon = day.weather[0].icon;
-            const isToday = moment.unix(day.dt).startOf('day').isSame(todayDate);
+          data.list.forEach(item => {
+            const date = moment(item.dt_txt).format('YYYY-MM-DD');
+            if (!groupedByDay[date]) {
+              groupedByDay[date] = [];
+            }
+            groupedByDay[date].push(item);
+          });
 
-            dailyHTML += `
-              <div class="forecast-card ${isToday ? 'today-forecast' : ''}" onclick="showHourlyForecast(${index})">
-                <h5>${date}</h5>
-                <img src="http://openweathermap.org/img/wn/${icon}@2x.png" alt="Weather icon">
-                <p>Day: ${tempDay} °C</p>
-                <p>Night: ${tempNight} °C</p>
-                <p>${description}</p>
-              </div>
-            `;
-          }
-        });
+          Object.keys(groupedByDay).forEach((date, index) => {
+            if (index < 5) { // Limit to 5 days
+              const dayData = groupedByDay[date];
+              const dayTitle = moment(date).format('MMMM Do');
+              forecastHTML += `<div class="forecast-day"><h5>${dayTitle}</h5>`;
 
-        dailyHTML += '</div>';
-        dailyForecast.innerHTML = dailyHTML;
-        dailyForecast.style.display = 'block';
-        window.hourlyData = data.hourly;
-        window.hourlyDataFull = data.hourly;
-      })
-      .catch(error => handleError(error));
+              dayData.forEach(hourlyData => {
+                const time = moment(hourlyData.dt_txt).format('h A');
+                const temp = (hourlyData.main.temp - 273.15).toFixed(2);
+                const description = hourlyData.weather[0].description;
+                const icon = hourlyData.weather[0].icon;
+
+                forecastHTML += `
+                            <div class="hourly-forecast-card">
+                                <p>${time}</p>
+                                <img src="http://openweathermap.org/img/wn/${icon}@2x.png" alt="Weather icon">
+                                <p>${temp} °C</p>
+                                <p>${description}</p>
+                            </div>
+                        `;
+              });
+
+              forecastHTML += '</div>'; // Close forecast-day
+            }
+          });
+
+          forecastHTML += '</div>'; // Close forecast-container
+          dailyForecast.innerHTML = forecastHTML;
+          dailyForecast.style.display = 'block';
+        })
+        .catch(error => handleError(error));
     });
   }
+
 
   // Fetches a single use token for authentication
   function fetchToken() {
@@ -205,7 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function displayWeatherData(data) {
     hideLoading();
     content.style.display = 'block';
-  
+
     const todayDate = moment().format('MMMM Do, YYYY');
     const temperature = (data.main.temp - 273.15).toFixed(2);
     const feelsLike = (data.main.feels_like - 273.15).toFixed(2);
@@ -216,7 +228,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const sunrise = moment.unix(data.sys.sunrise).format('h:mm:ss a');
     const sunset = moment.unix(data.sys.sunset).format('h:mm:ss a');
     const icon = data.weather[0].icon;
-  
+
     content.innerHTML = `
       <div class="weather-card animated fadeIn">
         <h2>Weather in ${data.name}</h2>
@@ -233,7 +245,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <canvas id="weatherChart" width="400" height="200"></canvas>
       </div>
     `;
-  
+
     const ctx = document.getElementById('weatherChart').getContext('2d');
     new Chart(ctx, {
       type: 'bar',
@@ -255,34 +267,34 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
     });
-  
+
     const now = new Date().toISOString();
     localStorage.setItem('lastFetchTimestamp', now);
     logInteraction('WEATHER', 'Created weather chart');
     showNotification('Weather data updated');
     updateLastFetchTime();
-  }  
+  }
 
   // Displays the hourly forecast for the selected day.
-  window.showHourlyForecast = function(dayIndex) {
+  window.showHourlyForecast = function (dayIndex) {
     const start = dayIndex * 24;
     const end = start + 24;
     const hourlyData = window.hourlyDataFull.slice(start, end);
-  
+
     // Remove the 'selected' class from all forecast cards
     document.querySelectorAll('.forecast-card').forEach(card => {
       card.classList.remove('selected');
     });
-  
+
     // Add the 'selected' class to the clicked card
     const selectedCard = document.querySelectorAll('.forecast-card')[dayIndex];
     selectedCard.classList.add('selected');
-  
+
     // Auto scroll to center the selected card
     selectedCard.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
-  
+
     let hourlyHTML = '<h3>Hourly Forecast</h3><div class="hourly-forecast">';
-  
+
     if (hourlyData.length === 0) {
       hourlyHTML += '<p class="no-data">No data available for this day.</p>';
     } else {
@@ -290,7 +302,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const hourTime = moment.unix(hour.dt).format('HH:mm');
         const hourTemp = (hour.temp - 273.15).toFixed(2);
         const hourIcon = hour.weather[0].icon;
-  
+
         hourlyHTML += `
           <div class="hourly-card">
             <h6>${hourTime}</h6>
@@ -300,12 +312,12 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
       });
     }
-  
+
     hourlyHTML += '</div>';
     hourlyForecast.innerHTML = hourlyHTML;
     hourlyForecast.style.display = 'block';
   };
-  
+
 
   // Fetches the user's current location.
   function getUserLocation() {
