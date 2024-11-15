@@ -148,86 +148,97 @@ body {
   margin: 5px auto;
 }
 
-/* Forecast Container */
+/* General Forecast Container */
 .forecast-container {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 20px;
-  padding: 20px;
-  justify-content: center;
+  padding: 10px;
+  align-items: center;
 }
 
-/* Forecast Card */
-.forecast-card {
-  flex: 1 1 calc(25% - 20px);
-  /* Responsive card sizing */
-  margin: 10px;
-  padding: 15px;
+/* Forecast Day */
+.forecast-day {
+  width: 100%;
   background-color: #ffffff;
-  border-radius: 15px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  text-align: center;
-  min-width: 150px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+  margin-bottom: 20px;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  cursor: pointer;
 }
 
-.forecast-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-}
-
-/* Highlighting the Current Day */
-.forecast-card.selected {
+.forecast-day.selected {
   border: 2px solid #007bff;
   background-color: #e8f4ff;
-  transform: translateY(-5px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
-/* Forecast Card Title */
-.forecast-card h5 {
-  font-size: 1.2rem;
+/* Forecast Day Title */
+.forecast-day h5 {
+  font-size: 1.3rem;
   margin-bottom: 15px;
   color: #333;
+  text-align: center;
 }
 
-/* Forecast Card Temperature and Description */
-.forecast-card p {
+/* Hourly Forecast Card */
+.hourly-forecast-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  margin: 10px 0;
+  transition: transform 0.2s ease;
+}
+
+.hourly-forecast-card:hover {
+  transform: translateY(-3px);
+}
+
+/* Hourly Card Details */
+.hourly-forecast-card img {
+  width: 50px;
+  height: 50px;
+}
+
+.hourly-forecast-card p {
   font-size: 1rem;
-  margin: 8px 0;
+  margin: 0 10px;
   color: #555;
 }
 
-/* Hourly Forecast */
-.hourly-forecast-card {
-  flex: 0 0 auto;
-  margin: 10px;
-  padding: 10px;
-  background-color: #f9f9f9;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  text-align: center;
-  min-width: 80px;
-}
-
-/* Hourly Forecast Card Title */
-.hourly-forecast-card p {
-  font-size: 0.9rem;
-  margin: 5px 0;
-  color: #666;
-}
-
-/* For Better Responsiveness */
+/* Media Queries for Mobile Responsiveness */
 @media screen and (max-width: 768px) {
-  .forecast-card {
-    flex: 1 1 calc(50% - 20px);
+  .forecast-day {
+    padding: 10px;
+  }
+
+  .hourly-forecast-card {
+    flex-direction: column;
+    padding: 10px;
+  }
+
+  .hourly-forecast-card p {
+    margin: 5px 0;
+    font-size: 0.9rem;
   }
 }
 
 @media screen and (max-width: 480px) {
-  .forecast-card {
-    flex: 1 1 calc(100% - 20px);
+  .forecast-day h5 {
+    font-size: 1.1rem;
+  }
+
+  .hourly-forecast-card img {
+    width: 40px;
+    height: 40px;
+  }
+
+  .hourly-forecast-card p {
+    font-size: 0.85rem;
   }
 }
 

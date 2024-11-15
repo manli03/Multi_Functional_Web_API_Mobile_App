@@ -139,11 +139,12 @@ document.addEventListener('DOMContentLoaded', () => {
           logInteraction('WEATHER', 'Fetched 3-hour forecast from API');
           forecast.style.display = 'block';
 
-          let currentDayHTML = '<h3>Today\'s Forecast</h3><div class="forecast-container">';
-          let forecastHTML = '<h3>5-Day Forecast</h3><div class="forecast-container">';
+          let currentDayHTML = '<h3>Today\'s Forecast</h3>';
+          let forecastHTML = '<h3>5-Day Forecast</h3>';
           const todayDate = moment().format('YYYY-MM-DD');
           const groupedByDay = {};
 
+          // Group the data by date
           data.list.forEach(item => {
             const date = moment(item.dt_txt).format('YYYY-MM-DD');
             if (!groupedByDay[date]) {
@@ -152,10 +153,13 @@ document.addEventListener('DOMContentLoaded', () => {
             groupedByDay[date].push(item);
           });
 
+          // Loop through each day and build the HTML
           Object.keys(groupedByDay).forEach((date, index) => {
             const dayData = groupedByDay[date];
             const dayTitle = moment(date).format('MMMM Do');
-            let dayHTML = `<div class="forecast-day ${date === todayDate ? 'selected' : ''}"><h5>${dayTitle}</h5>`;
+
+            let dayHTML = `<div class="forecast-day ${date === todayDate ? 'selected' : ''}">
+                                  <h5>${date === todayDate ? 'Today' : dayTitle}</h5>`;
 
             dayData.forEach(hourlyData => {
               const time = moment(hourlyData.dt_txt).format('h A');
@@ -177,13 +181,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (date === todayDate) {
               currentDayHTML += dayHTML;
-            } else if (index < 5) { // Limit to the next 5 days after today
+            } else if (index < 5) {
               forecastHTML += dayHTML;
             }
           });
-
-          currentDayHTML += '</div>'; // Close today's forecast-container
-          forecastHTML += '</div>'; // Close 5-day forecast-container
 
           dailyForecast.innerHTML = currentDayHTML + forecastHTML;
           dailyForecast.style.display = 'block';
