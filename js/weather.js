@@ -139,7 +139,9 @@ document.addEventListener('DOMContentLoaded', () => {
           logInteraction('WEATHER', 'Fetched 3-hour forecast from API');
           forecast.style.display = 'block';
 
-          let forecastHTML = '<h3>3-Hour Forecast for 5 Days</h3><div class="forecast-container">';
+          let currentDayHTML = '<h3>Today\'s Forecast</h3><div class="forecast-container">';
+          let forecastHTML = '<h3>5-Day Forecast</h3><div class="forecast-container">';
+          const todayDate = moment().format('YYYY-MM-DD');
           const groupedByDay = {};
 
           data.list.forEach(item => {
@@ -151,38 +153,45 @@ document.addEventListener('DOMContentLoaded', () => {
           });
 
           Object.keys(groupedByDay).forEach((date, index) => {
-            if (index < 5) { // Limit to 5 days
-              const dayData = groupedByDay[date];
-              const dayTitle = moment(date).format('MMMM Do');
-              forecastHTML += `<div class="forecast-day"><h5>${dayTitle}</h5>`;
+            const dayData = groupedByDay[date];
+            const dayTitle = moment(date).format('MMMM Do');
+            let dayHTML = `<div class="forecast-day ${date === todayDate ? 'selected' : ''}"><h5>${dayTitle}</h5>`;
 
-              dayData.forEach(hourlyData => {
-                const time = moment(hourlyData.dt_txt).format('h A');
-                const temp = (hourlyData.main.temp - 273.15).toFixed(2);
-                const description = hourlyData.weather[0].description;
-                const icon = hourlyData.weather[0].icon;
+            dayData.forEach(hourlyData => {
+              const time = moment(hourlyData.dt_txt).format('h A');
+              const temp = (hourlyData.main.temp - 273.15).toFixed(2);
+              const description = hourlyData.weather[0].description;
+              const icon = hourlyData.weather[0].icon;
 
-                forecastHTML += `
-                            <div class="hourly-forecast-card">
-                                <p>${time}</p>
-                                <img src="http://openweathermap.org/img/wn/${icon}@2x.png" alt="Weather icon">
-                                <p>${temp} °C</p>
-                                <p>${description}</p>
-                            </div>
-                        `;
-              });
+              dayHTML += `
+                        <div class="hourly-forecast-card">
+                            <p>${time}</p>
+                            <img src="http://openweathermap.org/img/wn/${icon}@2x.png" alt="Weather icon">
+                            <p>${temp} °C</p>
+                            <p>${description}</p>
+                        </div>
+                    `;
+            });
 
-              forecastHTML += '</div>'; // Close forecast-day
+            dayHTML += '</div>'; // Close forecast-day
+
+            if (date === todayDate) {
+              currentDayHTML += dayHTML;
+            } else if (index < 5) { // Limit to the next 5 days after today
+              forecastHTML += dayHTML;
             }
           });
 
-          forecastHTML += '</div>'; // Close forecast-container
-          dailyForecast.innerHTML = forecastHTML;
+          currentDayHTML += '</div>'; // Close today's forecast-container
+          forecastHTML += '</div>'; // Close 5-day forecast-container
+
+          dailyForecast.innerHTML = currentDayHTML + forecastHTML;
           dailyForecast.style.display = 'block';
         })
         .catch(error => handleError(error));
     });
   }
+
 
 
   // Fetches a single use token for authentication
