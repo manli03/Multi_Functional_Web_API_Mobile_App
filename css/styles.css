@@ -159,12 +159,12 @@ body {
 
 /* Forecast Day */
 .forecast-day {
-  width: 100%;
+  width: 90%;
   background-color: #ffffff;
   border-radius: 10px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   padding: 15px;
-  margin: 0 5px 20px 5px;
+  margin-bottom: 20px;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
