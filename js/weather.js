@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const content = document.getElementById('content');
   const forecast = document.getElementById('forecast');
   const dailyForecast = document.getElementById('daily-forecast');
-  const hourlyForecast = document.getElementById('hourly-forecast');
+  // const hourlyForecast = document.getElementById('hourly-forecast');
   const notification = document.getElementById('notification');
   const lastFetchTimeDisplay = document.getElementById('last-fetch-time');
   const backToHomePageButton = document.querySelector('.btn-secondary');
@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function updateLastFetchTime() {
     const lastFetchTimestamp = localStorage.getItem('lastFetchTimestamp');
     if (lastFetchTimestamp) {
-      const formattedTime = moment(lastFetchTimestamp).format('h:mm:ss a');
+      const formattedTime = moment(lastFetchTimestamp).format('h:mm a');
       lastFetchTimeDisplay.textContent = `Last Fetch Time: ${formattedTime}`;
     } else {
       lastFetchTimeDisplay.textContent = 'No previous fetch recorded.';
@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Clears the content of daily and hourly forecast sections.
   function resetContent() {
     dailyForecast.innerHTML = '';
-    hourlyForecast.innerHTML = '';
+    // hourlyForecast.innerHTML = '';
     content.innerHTML = '';
   }
 
@@ -234,8 +234,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const humidity = data.main.humidity;
     const windSpeed = data.wind.speed;
     const visibility = data.visibility / 1000;
-    const sunrise = moment.unix(data.sys.sunrise).format('h:mm:ss a');
-    const sunset = moment.unix(data.sys.sunset).format('h:mm:ss a');
+    const sunrise = moment.unix(data.sys.sunrise).format('h:mm a');
+    const sunset = moment.unix(data.sys.sunset).format('h:mm a');
     const icon = data.weather[0].icon;
 
     content.innerHTML = `
@@ -323,8 +323,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     hourlyHTML += '</div>';
-    hourlyForecast.innerHTML = hourlyHTML;
-    hourlyForecast.style.display = 'block';
+    // hourlyForecast.innerHTML = hourlyHTML;
+    // hourlyForecast.style.display = 'block';
   };
 
 
