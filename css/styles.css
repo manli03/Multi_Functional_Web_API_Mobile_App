@@ -181,16 +181,32 @@ body {
   text-align: center;
 }
 
+/* Hourly Forecast - Horizontal Scroll */
+.hourly-forecast {
+  display: flex;
+  overflow-x: auto;
+  gap: 15px;
+  padding: 10px 0;
+}
+
+.hourly-forecast::-webkit-scrollbar {
+  height: 6px;
+}
+
+.hourly-forecast::-webkit-scrollbar-thumb {
+  background: #cccccc;
+  border-radius: 10px;
+}
+
 /* Hourly Forecast Card */
 .hourly-forecast-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex: 0 0 auto;
+  width: 100px;
+  padding: 10px;
   background-color: #f9f9f9;
   border-radius: 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 10px;
-  margin: 10px 0;
+  text-align: center;
   transition: transform 0.2s ease;
 }
 
@@ -205,8 +221,8 @@ body {
 }
 
 .hourly-forecast-card p {
-  font-size: 1rem;
-  margin: 0 10px;
+  font-size: 0.9rem;
+  margin: 5px 0;
   color: #555;
 }
 
@@ -217,13 +233,11 @@ body {
   }
 
   .hourly-forecast-card {
-    flex-direction: column;
-    padding: 10px;
+    width: 90px;
   }
 
   .hourly-forecast-card p {
-    margin: 5px 0;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
   }
 }
 
@@ -238,7 +252,7 @@ body {
   }
 
   .hourly-forecast-card p {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
   }
 }
 
