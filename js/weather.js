@@ -368,30 +368,8 @@ document.addEventListener('DOMContentLoaded', () => {
     logInteraction('WEATHER', 'Error fetching user location', error.message);
     hideLoading();
     content.style.display = 'block';
-
-    // If geolocation failed, prompt the user to enable location services.
-    content.innerHTML = `
-    <p class="text-danger">Failed to get your location. Please enable location services and try again.</p>
-    <button id="enableLocationButton">Enable Location</button>
-  `;
-
-    // Add a click listener to the "Enable Location" button to redirect to location settings
-    const enableLocationButton = document.getElementById('enableLocationButton');
-    if (enableLocationButton) {
-      enableLocationButton.addEventListener('click', () => {
-        // Detect if the user is on Android, and use an Intent URL to open location settings
-        const userAgent = navigator.userAgent.toLowerCase();
-        if (userAgent.indexOf('android') > -1) {
-          // Android-specific Intent URL to open location settings
-          window.location.href = "intent://settings/location#Intent;scheme=android;package=com.android.settings;end";
-        } else {
-          // For non-Android users, direct them to a generic help page or instructions
-          alert("Please enable location services in your device settings.");
-        }
-      });
-    }
+    content.innerHTML = '<p class="text-danger">Failed to get your location. Please enable location services and try again.</p>';
   }
-
 
   updateLastFetchTime();
 });
